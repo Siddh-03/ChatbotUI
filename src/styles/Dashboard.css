@@ -1,10 +1,10 @@
 /* Dashboard CSS - All classes prefixed with 'dash-' */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
 
 /* --- CSS Variables --- */
 :root {
-  --dash-font-main: 'Inter', sans-serif;
+  --dash-font-main: "Inter", sans-serif;
   /* Light Theme Only */
   --dash-bg-color: #f4f7f9;
   --dash-sidebar-bg: rgba(255, 255, 255, 0.7);
@@ -22,13 +22,26 @@
   --dash-secondary-light: #e3fcef;
   --dash-accent-gradient-start: var(--dash-primary-color);
   --dash-accent-gradient-end: var(--dash-secondary-color);
-  --dash-accent-gradient: linear-gradient(135deg, var(--dash-accent-gradient-start), var(--dash-accent-gradient-end));
-  --dash-animated-bg-gradient: linear-gradient(-45deg, var(--dash-primary-light), #e6f7ff, var(--dash-secondary-light), #f0fff0);
+  --dash-accent-gradient: linear-gradient(
+    135deg,
+    var(--dash-accent-gradient-start),
+    var(--dash-accent-gradient-end)
+  );
+  --dash-animated-bg-gradient: linear-gradient(
+    -45deg,
+    var(--dash-primary-light),
+    #e6f7ff,
+    var(--dash-secondary-light),
+    #f0fff0
+  );
   --dash-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.03);
   --dash-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
-  --dash-shadow-md: 0 4px 8px -2px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
-  --dash-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --dash-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --dash-shadow-md: 0 4px 8px -2px rgba(0, 0, 0, 0.06),
+    0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --dash-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --dash-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   --dash-shadow-hover-color: rgba(0, 82, 204, 0.15);
   --dash-icon-color: #6b7280;
   --dash-icon-active-color: var(--dash-primary-color);
@@ -44,19 +57,37 @@
   --dash-info-color: #3498db;
   --dash-info-light: #e1f3ff;
   --dash-purple-color: #8e44ad;
-  --dash-card-shine-gradient: linear-gradient(100deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 80%);
-  --dash-button-shine-gradient: linear-gradient(110deg, transparent 20%, rgba(255,255,255,0.25) 50%, transparent 80%);
+  --dash-card-shine-gradient: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 20%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 80%
+  );
+  --dash-button-shine-gradient: linear-gradient(
+    110deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.25) 50%,
+    transparent 80%
+  );
 }
 
 /* Removed Dark Mode Block */
 
 /* --- Base & Layout --- */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; font-size: 100%; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html {
+  scroll-behavior: smooth;
+  font-size: 100%;
+}
 
-.dash-app-container { 
-  display: flex; 
-  min-height: 100vh; 
+.dash-app-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
   position: relative;
   font-family: var(--dash-font-main);
   background-color: var(--dash-bg-color);
@@ -69,9 +100,15 @@ html { scroll-behavior: smooth; font-size: 100%; }
 
 /* --- Animated Background --- */
 @keyframes dash-animatedBackground {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .dash-animated-gradient-bg {
@@ -120,9 +157,9 @@ html { scroll-behavior: smooth; font-size: 100%; }
 }
 
 .dash-loader-logo-placeholder img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .dash-loader-text {
@@ -146,7 +183,8 @@ html { scroll-behavior: smooth; font-size: 100%; }
   left: 0;
   top: 0;
   z-index: 1000;
-  transition: width 0.35s ease-in-out, background 0.3s ease, border-color 0.3s ease, transform 0.35s ease-in-out;
+  transition: width 0.35s ease-in-out, background 0.3s ease,
+    border-color 0.3s ease, transform 0.35s ease-in-out;
   padding: 0;
 }
 
@@ -167,7 +205,7 @@ html { scroll-behavior: smooth; font-size: 100%; }
 }
 
 .dash-logo-icon {
-  width: 40px; 
+  width: 40px;
   height: 40px;
   display: flex;
   align-items: center;
@@ -176,9 +214,9 @@ html { scroll-behavior: smooth; font-size: 100%; }
 }
 
 .dash-logo-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .dash-logo-text {
@@ -278,7 +316,8 @@ html { scroll-behavior: smooth; font-size: 100%; }
   color: var(--dash-text-muted);
   font-weight: 500;
   font-size: 0.9rem;
-  transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease, padding 0.3s ease;
+  transition: background-color 0.25s ease, color 0.25s ease,
+    box-shadow 0.25s ease, transform 0.15s ease, padding 0.3s ease;
   white-space: nowrap;
   overflow: hidden;
   text-decoration: none;
@@ -390,7 +429,12 @@ html { scroll-behavior: smooth; font-size: 100%; }
   min-width: 0;
 }
 
-body.dash-sidebar-collapsed .dash-main-content-wrapper {
+.dash-sidebar-collapsed .dash-main-content-wrapper {
+  margin-left: var(--dash-sidebar-collapsed-width);
+}
+
+/* FIXED: Target the wrapper directly since the class is applied there, not on body */
+.dash-main-content-wrapper.dash-sidebar-collapsed {
   margin-left: var(--dash-sidebar-collapsed-width);
 }
 
@@ -455,13 +499,15 @@ body.dash-sidebar-collapsed .dash-main-content-wrapper {
   background-color: var(--dash-card-bg);
   color: var(--dash-text-color);
   font-size: 0.9rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease,
+    background-color 0.3s ease;
 }
 
 .dash-search-bar input:focus {
   outline: none;
   border-color: var(--dash-primary-color);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--dash-primary-color) 20%, transparent);
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--dash-primary-color) 20%, transparent);
 }
 
 .dash-header-actions {
@@ -515,7 +561,9 @@ body.dash-sidebar-collapsed .dash-main-content-wrapper {
   opacity: 0;
   visibility: hidden;
   transform: translateY(10px) scale(0.95);
-  transition: opacity 0.25s ease-out, transform 0.25s cubic-bezier(0.165, 0.84, 0.44, 1), visibility 0s linear 0.25s;
+  transition: opacity 0.25s ease-out,
+    transform 0.25s cubic-bezier(0.165, 0.84, 0.44, 1),
+    visibility 0s linear 0.25s;
   overflow: hidden;
 }
 
@@ -634,7 +682,8 @@ body.dash-sidebar-collapsed .dash-main-content-wrapper {
   bottom: -2px;
   border: 2px solid transparent;
   border-bottom: none;
-  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+  transition: color 0.2s ease, background-color 0.2s ease,
+    border-color 0.2s ease;
   background: none;
   cursor: pointer;
   font-family: var(--dash-font-main);
@@ -650,7 +699,11 @@ body.dash-sidebar-collapsed .dash-main-content-wrapper {
 
 .dash-tab-btn:hover:not(.dash-active) {
   color: var(--dash-primary-color);
-  background-color: color-mix(in srgb, var(--dash-border-color) 50%, transparent);
+  background-color: color-mix(
+    in srgb,
+    var(--dash-border-color) 50%,
+    transparent
+  );
 }
 
 /* --- Grid --- */
@@ -671,7 +724,9 @@ body.dash-sidebar-collapsed .dash-main-content-wrapper {
   border-radius: 16px;
   padding: 30px;
   box-shadow: var(--dash-shadow-sm);
-  transition: transform 0.35s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.35s cubic-bezier(0.165, 0.84, 0.44, 1), background-color 0.3s ease, border-color 0.3s ease;
+  transition: transform 0.35s cubic-bezier(0.165, 0.84, 0.44, 1),
+    box-shadow 0.35s cubic-bezier(0.165, 0.84, 0.44, 1),
+    background-color 0.3s ease, border-color 0.3s ease;
   position: relative;
   overflow: hidden;
 }
@@ -679,7 +734,8 @@ body.dash-sidebar-collapsed .dash-main-content-wrapper {
 .dash-animate-in {
   opacity: 0;
   transform: translateY(25px) scale(0.98);
-  animation: dash-cardFadeInUpScale 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  animation: dash-cardFadeInUpScale 0.6s cubic-bezier(0.165, 0.84, 0.44, 1)
+    forwards;
 }
 
 @keyframes dash-cardFadeInUpScale {
@@ -695,13 +751,15 @@ body.dash-sidebar-collapsed .dash-main-content-wrapper {
   display: flex;
   flex-direction: column;
   box-shadow: var(--dash-shadow-sm);
-  transition: transform 0.35s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.35s cubic-bezier(0.165, 0.84, 0.44, 1), background-color 0.3s ease, border-color 0.3s ease;
+  transition: transform 0.35s cubic-bezier(0.165, 0.84, 0.44, 1),
+    box-shadow 0.35s cubic-bezier(0.165, 0.84, 0.44, 1),
+    background-color 0.3s ease, border-color 0.3s ease;
   perspective: 1500px;
   position: relative;
 }
 
 .dash-agent-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
@@ -729,7 +787,7 @@ body.dash-sidebar-collapsed .dash-main-content-wrapper {
   font-size: 0.7rem;
   font-weight: 600;
   z-index: 10;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .dash-agent-image-wrapper {
@@ -883,7 +941,7 @@ body.dash-sidebar-collapsed .dash-main-content-wrapper {
 }
 
 .dash-button::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -150%;
@@ -1000,7 +1058,8 @@ body.dash-sidebar-collapsed .dash-main-content-wrapper {
   box-shadow: var(--dash-shadow-lg);
   z-index: 1005;
   cursor: pointer;
-  transition: transform 0.2s ease-out, background-color 0.2s ease, color 0.2s ease;
+  transition: transform 0.2s ease-out, background-color 0.2s ease,
+    color 0.2s ease;
   background-color: var(--dash-primary-color);
   color: #fff;
   border: none;
@@ -1028,7 +1087,8 @@ body.dash-sidebar-collapsed .dash-main-content-wrapper {
   opacity: 0;
   visibility: hidden;
   transform: translateY(20px) scale(0.95);
-  transition: opacity 0.3s ease, visibility 0s linear 0.3s, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: opacity 0.3s ease, visibility 0s linear 0.3s,
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .dash-chatbot-widget.dash-open {
@@ -1061,7 +1121,7 @@ body.dash-sidebar-collapsed .dash-main-content-wrapper {
 }
 
 .dash-close-chatbot-btn:hover {
-  background-color: rgba(255,255,255,0.2);
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .dash-chatbot-body {
@@ -1123,7 +1183,8 @@ body.dash-sidebar-collapsed .dash-main-content-wrapper {
 .dash-chatbot-footer input:focus {
   outline: none;
   border-color: var(--dash-primary-color);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--dash-primary-color) 20%, transparent);
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--dash-primary-color) 20%, transparent);
 }
 
 /* --- Responsive --- */
@@ -1145,14 +1206,14 @@ body.dash-sidebar-collapsed .dash-main-content-wrapper {
     transform: translateX(-100%);
     width: var(--dash-sidebar-width);
   }
-  
+
   body.dash-sidebar-mobile-open .dash-sidebar {
     transform: translateX(0);
     box-shadow: var(--dash-shadow-xl);
   }
-  
+
   body.dash-sidebar-mobile-open::after {
-    content: '';
+    content: "";
     position: fixed;
     top: 0;
     left: 0;
@@ -1163,23 +1224,23 @@ body.dash-sidebar-collapsed .dash-main-content-wrapper {
     opacity: 1;
     visibility: visible;
   }
-  
+
   .dash-main-content-wrapper {
     margin-left: 0;
   }
-  
+
   .dash-mobile-bottom-nav {
     display: block;
   }
-  
+
   .dash-mobile-sidebar-toggle {
     display: block;
   }
-  
+
   .dash-main-header {
     padding: 0 20px;
   }
-  
+
   .dash-search-bar {
     position: relative;
     left: auto;
@@ -1190,28 +1251,29 @@ body.dash-sidebar-collapsed .dash-main-content-wrapper {
     margin-right: 10px;
     margin-left: 0;
   }
-  
+
   .dash-header-actions {
     gap: 10px;
   }
-  
+
   .dash-icon-btn {
     font-size: 1.2rem;
     padding: 8px;
   }
-  
+
   .dash-main-content-area {
     padding: 25px 20px 100px 20px;
+    width: 100%;
   }
-  
+
   .dash-page-header h2 {
     font-size: 1.6rem;
   }
-  
+
   .dash-agent-grid.dash-has-horizontal-cards {
     grid-template-columns: 1fr;
   }
-  
+
   .dash-chatbot-fab {
     bottom: 80px;
     right: 20px;
@@ -1219,7 +1281,7 @@ body.dash-sidebar-collapsed .dash-main-content-wrapper {
     height: 50px;
     font-size: 1.2rem;
   }
-  
+
   .dash-chatbot-widget {
     width: calc(100% - 40px);
     max-height: 70vh;
@@ -1232,47 +1294,47 @@ body.dash-sidebar-collapsed .dash-main-content-wrapper {
   .dash-page-header h2 {
     font-size: 1.5rem;
   }
-  
+
   .dash-page-header p {
     font-size: 0.9rem;
   }
-  
+
   .dash-tabs {
     gap: 4px;
   }
-  
+
   .dash-tab-btn {
     padding: 10px 15px;
     font-size: 0.85rem;
   }
-  
+
   .dash-card {
     padding: 20px;
   }
-  
+
   .dash-agent-card.dash-horizontal-medium {
     padding: 15px;
     gap: 15px;
   }
-  
+
   .dash-agent-card.dash-horizontal-medium .dash-agent-image-wrapper {
     width: 60px;
     height: 60px;
   }
-  
+
   .dash-chatbot-widget {
     width: calc(100% - 30px);
     right: 15px;
   }
-  
+
   .dash-chatbot-fab {
     right: 15px;
   }
-  
+
   .dash-agent-card.dash-horizontal-medium .dash-actions {
     flex-wrap: wrap;
   }
-  
+
   .dash-agent-card.dash-horizontal-medium .dash-actions .dash-button-sm {
     padding: 7px 8px;
     font-size: 0.7rem;
@@ -1284,12 +1346,12 @@ body.dash-sidebar-collapsed .dash-main-content-wrapper {
   .dash-search-bar {
     min-width: 100px;
   }
-  
+
   .dash-search-bar input {
     padding: 8px 12px 8px 30px;
     font-size: 0.85rem;
   }
-  
+
   .dash-search-icon {
     left: 10px;
     font-size: 0.9rem;
