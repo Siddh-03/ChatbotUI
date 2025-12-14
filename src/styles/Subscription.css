@@ -1,0 +1,215 @@
+/* subscriptions.css - Only new styles needed beyond dash.css */
+
+/* Subscription Card Specific */
+.subscription-chatbot-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.subscription-chatbot-card-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--dash-border-color);
+}
+
+.chatbot-icon-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  object-fit: cover;
+  background-color: var(--dash-border-color);
+  flex-shrink: 0;
+}
+
+.chatbot-info h3 {
+  margin-bottom: 4px;
+  font-size: 1.15rem;
+}
+
+.chatbot-info .description {
+  font-size: 0.85rem;
+  color: var(--dash-text-muted);
+  margin-bottom: 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subscription-plans-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 15px;
+  flex-grow: 1;
+}
+
+@media (max-width: 500px) {
+  .subscription-plans-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.plan-card-item {
+  background-color: var(--dash-main-bg);
+  border: 1px solid var(--dash-border-color);
+  border-radius: 12px;
+  padding: 15px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.plan-card-item:hover:not(.current-plan) {
+  transform: translateY(-3px);
+  box-shadow: var(--dash-shadow-md);
+}
+
+.plan-card-item.current-plan {
+  border-left: 4px solid var(--dash-secondary-color);
+  background-color: color-mix(
+    in srgb,
+    var(--dash-secondary-color) 10%,
+    var(--dash-main-bg)
+  );
+}
+
+.plan-card-item h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: var(--dash-text-color);
+}
+
+.plan-card-item .price {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--dash-primary-color);
+  margin-bottom: 12px;
+}
+
+.plan-card-item .plan-features {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 15px;
+  font-size: 0.8rem;
+  color: var(--dash-text-muted);
+  flex-grow: 1;
+}
+
+.plan-card-item .plan-features li {
+  margin-bottom: 6px;
+  padding-left: 20px;
+  position: relative;
+}
+
+.plan-card-item .plan-features li::before {
+  content: "\f00c";
+  font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands";
+  font-weight: 900;
+  color: var(--dash-secondary-color);
+  position: absolute;
+  left: 0;
+  top: 2px;
+}
+
+.plan-card-item .select-plan-btn {
+  width: 100%;
+  margin-top: auto;
+  padding: 10px 15px;
+  font-size: 0.8rem;
+}
+
+.plan-card-item .current-plan-indicator {
+  display: block;
+  text-align: center;
+  padding: 10px 15px;
+  border-radius: 8px;
+  background-color: var(--dash-secondary-light);
+  color: var(--dash-secondary-color);
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-top: auto;
+}
+
+/* Upgrade Modal Specific */
+.upgrade-modal-header-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--dash-border-color);
+}
+
+.upgrade-modal-chatbot-icon-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  object-fit: cover;
+  background-color: var(--dash-border-color);
+  flex-shrink: 0;
+  box-shadow: var(--dash-shadow-xs);
+}
+
+#upgradeModalChatbotName.upgrade-modal-chatbot-title {
+  text-align: left;
+  font-size: 1.3rem;
+  margin-bottom: 0;
+  font-weight: 600;
+  color: var(--dash-text-color);
+}
+
+.plan-details {
+  padding: 20px 0;
+}
+
+.price-display h2 {
+  font-size: 2.5rem;
+  color: var(--dash-primary-color);
+  margin-bottom: 5px;
+}
+
+.billing-info {
+  color: var(--dash-text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.features-list h4 {
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+.features-list ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 30px;
+}
+
+.features-list ul li {
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.check-icon {
+  color: var(--dash-secondary-color);
+  font-weight: bold;
+}
+
+.payment-section {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.payment-section .dash-button {
+  flex-grow: 1;
+}
