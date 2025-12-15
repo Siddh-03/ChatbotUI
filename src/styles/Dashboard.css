@@ -429,7 +429,7 @@ html {
   min-width: 0;
 }
 
-/* .dash-sidebar-collapsed .dash-main-content-wrapper {
+/* body.dash-sidebar-collapsed .dash-main-content-wrapper {
   margin-left: var(--dash-sidebar-collapsed-width);
 } */
 
@@ -617,7 +617,7 @@ html {
 /* --- Main Content Area --- */
 .dash-main-content-area {
   flex-grow: 1;
-  padding: 10px;
+  padding: 30px;
   background-color: var(--dash-main-bg);
   transition: background-color 0.3s ease;
   padding-bottom: 120px;
@@ -651,7 +651,7 @@ html {
 }
 
 .dash-page-header h2 {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 800;
   margin-bottom: 10px;
 }
@@ -928,7 +928,7 @@ html {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 5px;
   background-color: var(--dash-primary-color);
   color: #fff;
   box-shadow: var(--dash-shadow-sm);
@@ -973,7 +973,7 @@ html {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 2px;
   cursor: pointer;
   transition: all 0.25s ease-out;
   font-family: var(--dash-font-main);
@@ -1205,14 +1205,20 @@ html {
   .dash-sidebar {
     transform: translateX(-100%);
     width: var(--dash-sidebar-width);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 1000;
+    transition: transform 0.3s ease-in-out;
   }
 
-  body.dash-sidebar-mobile-open .dash-sidebar {
-    transform: translateX(0);
+  .dash-app-container.dash-sidebar-mobile-open .dash-sidebar {
+    transform: translateX(0) !important;
     box-shadow: var(--dash-shadow-xl);
   }
 
-  body.dash-sidebar-mobile-open::after {
+  .dash-app-container.dash-sidebar-mobile-open::after {
     content: "";
     position: fixed;
     top: 0;
@@ -1224,6 +1230,10 @@ html {
     opacity: 1;
     visibility: visible;
   }
+
+  /* .dash-sidebar-toggle-btn {
+    display: none;
+  } */
 
   .dash-main-content-wrapper {
     margin-left: 0;
@@ -1263,7 +1273,6 @@ html {
 
   .dash-main-content-area {
     padding: 25px 20px 100px 20px;
-    /* width: 100%; */
   }
 
   .dash-page-header h2 {
@@ -1377,4 +1386,59 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   background-color: var(--dash-text-muted);
+}
+
+/* =========================================
+   FIX: 320px RESPONISVE ADJUSTMENTS
+   ========================================= */
+@media (max-width: 374px) {
+  /* 1. Header: Hide search bar on tiny screens if needed, or shrink it */
+  .dash-search-bar {
+    display: none; /* Often best to hide non-critical search on 320px */
+  }
+
+  .dash-main-header {
+    padding: 0 10px;
+    justify-content: space-between;
+  }
+
+  /* 2. Content Area: Remove almost all padding */
+  .dash-main-content-area {
+    padding: 10px 5px 80px 5px; /* Minimal side padding */
+  }
+
+  .dash-page-header h2 {
+    font-size: 1.3rem; /* Smaller title */
+  }
+
+  /* 3. Cards: Compact layout */
+  .dash-card,
+  .dash-agent-card.dash-horizontal-medium {
+    padding: 12px; /* Reduce padding inside cards */
+    gap: 10px;
+  }
+
+  .dash-agent-card.dash-horizontal-medium .dash-agent-image-wrapper {
+    width: 50px;
+    height: 50px; /* Smaller images */
+  }
+
+  .dash-agent-card h3 {
+    font-size: 0.95rem;
+  }
+
+  /* 4. Tabs: Scrollable instead of wrapping messy */
+  .dash-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: 5px;
+    -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+  }
+
+  .dash-tab-btn {
+    white-space: nowrap;
+    font-size: 0.8rem;
+    padding: 8px 12px;
+  }
 }

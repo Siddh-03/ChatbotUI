@@ -1,33 +1,62 @@
 // src/App.jsx
-import { Routes, Route, Navigate } from 'react-router-dom';
-import Dashboard from './pages/Dashboard';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import ForgotPassword from './pages/ForgotPassword';
-import ChatPage from './pages/ChatPage';
-import Subscription from './pages/Subscription';
-// import Conversations from './pages/Conversations';
+import { Routes, Route, Navigate } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
+import ChatPage from "./pages/ChatPage";
+import Subscription from "./pages/Subscription";
+import Settings from "./pages/Settings";
+import ProtectedRoute from "./components/Auth/ProtectedRoute"; // Import the bouncer
 
 function App() {
   return (
     <div className="App">
       <Routes>
-        {/* Commenting out auth pages for now as requested */}
+        {/* PUBLIC ROUTES - Accessible by anyone */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        
-        <Route path="/dashboard" element={<Dashboard />} />
-        {/* Dynamic route for chat, e.g., /chat/education or /chat/sports */}
-        <Route path="/chat/:botId" element={<ChatPage />} />
-        
-        {/* Subscription page isn't created yet, so user can add it here later */}
-        <Route path="/subscriptions" element={<Subscription />} />
-        
-        {/* <Route path="/conversations" element={<Conversations />} /> */}
-        
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
 
+        {/* PROTECTED ROUTES - Only accessible if logged in */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/chat/:botId"
+          element={
+            <ProtectedRoute>
+              <ChatPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/subscriptions"
+          element={
+            <ProtectedRoute>
+              <Subscription />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Default Redirect */}
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </div>
   );

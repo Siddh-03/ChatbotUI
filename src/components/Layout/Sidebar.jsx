@@ -1,67 +1,105 @@
-import React from 'react';
-import { 
-  FaRobot, FaRegComments, FaRegCreditCard, FaChartSimple, 
-  FaGear, FaBookOpen, FaLifeRing, FaShapes, FaAngleLeft,
-  FaAngleRight, FaCircleUser
-} from 'react-icons/fa6';
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import {
+  FaRobot,
+  FaRegComments,
+  FaRegCreditCard,
+  FaChartPie,
+  FaCog,
+  FaBook,
+  FaLifeRing,
+  FaConciergeBell,
+  FaAngleLeft,
+  FaAngleRight,
+  FaUserAstronaut,
+} from "react-icons/fa"; // Using FontAwesome icons from react-icons/fa to match your class names
 
-const navItems = [
-  // Renamed Dashboard to AI Chatbots as requested for UI
-  { id: 'dashboard', label: 'AI Chatbots', icon: FaRobot, href: '/dashboard', badge: null },
-  { id: 'subscriptions', label: 'Subscriptions', icon: FaRegCreditCard, href: '/subscriptions', badge: null },
-  
-  // Commented out other options as requested
-  // { id: 'conversations', label: 'Conversations', icon: FaRegComments, href: '/conversations', badge: '3' },
-  // { id: 'analytics', label: 'Analytics', icon: FaChartSimple, href: '#', badge: null },
-  // { id: 'settings', label: 'Settings', icon: FaGear, href: '#', badge: null },
-  // { divider: true },
-  // { id: 'documentation', label: 'Documentation', icon: FaBookOpen, href: '#', badge: null },
-  // { id: 'support', label: 'Support', icon: FaLifeRing, href: '#', badge: null },
-  // { id: 'services', label: 'Services', icon: FaShapes, href: '#', badge: null }
-];
+const Sidebar = ({ collapsed, onToggle, userName, greeting }) => {
+  const location = useLocation();
 
-const Sidebar = ({ collapsed, onToggle, activePage, userName, greeting }) => {
+  // Helper to check if a link is active
+  const isActive = (path) => (location.pathname === path ? "dash-active" : "");
+
   return (
-    <aside className={`dash-sidebar ${collapsed ? 'dash-collapsed' : ''}`}>
+    <aside className={`dash-sidebar ${collapsed ? "dash-collapsed" : ""}`}>
       <div className="dash-sidebar-header">
         <div className="dash-logo-container">
-          {/* Replaced Icon with Image - Set your path below */}
           <div className="dash-logo-icon">
-            <img src="/assist/images/ybai.png" alt="Logo" /> 
+            <img src="/assist/images/ybai_shadow.png" alt="Logo" />
           </div>
           <h2 className="dash-logo-text">YBAI Solutions</h2>
         </div>
         <button className="dash-sidebar-toggle-btn" onClick={onToggle}>
-          <span>{collapsed ? <FaAngleRight /> : <FaAngleLeft />}</span>
+          {collapsed ? <FaAngleRight /> : <FaAngleLeft />}
         </button>
       </div>
 
       <div className="dash-user-profile">
-        <div className="dash-user-avatar"><FaCircleUser /></div>
+        <div className="dash-user-avatar">
+          <FaUserAstronaut />
+        </div>
         <span className="dash-user-greeting">{greeting},</span>
         <div className="dash-user-name">{userName}</div>
       </div>
 
       <nav className="dash-main-nav">
         <ul>
-          {navItems.map((item, index) => 
-            item.divider ? (
-              <li key={`divider-${index}`} className="dash-nav-divider"></li>
-            ) : (
-              <li key={item.id} className={activePage === item.id ? 'dash-active' : ''}>
-                <a href={item.href} onClick={(e) => item.href === '#' && e.preventDefault()}>
-                  <span className="dash-nav-icon"><item.icon /></span>
-                  <span className="dash-nav-text">{item.label}</span>
-                  {item.badge && <span className="dash-badge">{item.badge}</span>}
-                </a>
-              </li>
-            )
-          )}
+          <li className={isActive("/dashboard")}>
+            <Link to="/dashboard">
+              <span className="dash-nav-icon">
+                <FaRobot />
+              </span>
+              <span className="dash-nav-text">AI Chatbots</span>
+            </Link>
+          </li>
+
+          {/* Example for Conversations (Commented out in your snippet but included structure) */}
+          {/* <li className={isActive("/conversations")}>
+            <Link to="/conversations">
+              <span className="dash-nav-icon"><FaRegComments /></span>
+              <span className="dash-nav-text">Conversations</span>
+              <span className="dash-badge">3</span>
+            </Link>
+          </li> */}
+
+          <li className={isActive("/subscriptions")}>
+            <Link to="/subscriptions">
+              <span className="dash-nav-icon">
+                <FaRegCreditCard />
+              </span>
+              <span className="dash-nav-text">Subscriptions</span>
+            </Link>
+          </li>
+
+          {/* <li className={isActive("/analytics")}>
+            <Link to="/analytics">
+              <span className="dash-nav-icon"><FaChartPie /></span>
+              <span className="dash-nav-text">Analytics</span>
+            </Link>
+          </li> */}
+
+          <li className={isActive("/settings")}>
+            <Link to="/settings">
+              <span className="dash-nav-icon">
+                <FaCog />
+              </span>
+              <span className="dash-nav-text">Settings</span>
+            </Link>
+          </li>
+
+          <li className="dash-nav-divider"></li>
+
+          {/* <li className={isActive("/documentation")}>
+            <Link to="/documentation">
+              <span className="dash-nav-icon"><FaBook /></span>
+              <span className="dash-nav-text">Documentation</span>
+            </Link>
+          </li> */}
         </ul>
       </nav>
 
       <div className="dash-sidebar-footer">
-         {/* Theme switcher removed as requested */}
+        {/* Theme toggle logic will go here */}
       </div>
     </aside>
   );

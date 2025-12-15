@@ -1,0 +1,397 @@
+/* src/styles/Settings.css */
+
+/* --- Settings Page Grid --- */
+.dash-settings-grid {
+  display: grid;
+  gap: 25px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 992px) {
+  .dash-settings-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* --- Settings Card Component --- */
+.dash-settings-card {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--dash-card-bg);
+  border: 1px solid var(--dash-border-color);
+  border-radius: 16px;
+  box-shadow: var(--dash-shadow-sm);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  opacity: 0;
+  transform: translateY(25px) scale(0.98);
+  animation: dash-cardFadeInUpScale 0.6s cubic-bezier(0.165, 0.84, 0.44, 1)
+    forwards;
+}
+
+.dash-settings-card:hover {
+  box-shadow: var(--dash-shadow-md);
+  transform: translateY(-4px);
+}
+
+.dash-settings-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 20px 25px;
+  border-bottom: 1px solid var(--dash-border-color);
+}
+
+.dash-settings-icon {
+  font-size: 1.6rem;
+  color: var(--dash-primary-color);
+  margin-top: 3px;
+  width: 28px;
+  text-align: center;
+  flex-shrink: 0;
+  height: 28px;
+  line-height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Icon Colors */
+.dash-settings-icon.fa-user-circle {
+  color: var(--dash-primary-color);
+}
+.dash-settings-icon.fa-shield-alt {
+  color: var(--dash-secondary-color);
+}
+.dash-settings-icon.fa-bell {
+  color: var(--dash-warning-color);
+}
+.dash-settings-icon.fa-code-branch {
+  color: var(--dash-info-color);
+}
+.dash-settings-icon.fa-database {
+  color: var(--dash-purple-color);
+}
+.dash-settings-icon.fa-user-cog {
+  color: var(--dash-icon-color);
+}
+
+.dash-settings-card-header h3 {
+  font-size: 1.15rem;
+  margin-bottom: 4px;
+  font-weight: 600;
+  color: var(--dash-text-color);
+}
+
+.dash-settings-card-header p {
+  font-size: 0.8rem;
+  margin-bottom: 0;
+  line-height: 1.4;
+  color: var(--dash-text-muted);
+}
+
+.dash-settings-card-body {
+  padding: 25px;
+  flex-grow: 1;
+}
+
+.dash-settings-card-body .dash-button,
+.dash-settings-card-body .dash-button-secondary,
+.dash-settings-card-body .dash-button-danger {
+  margin-top: 15px;
+}
+
+/* --- Form Elements --- */
+.dash-form-group {
+  margin-bottom: 25px;
+}
+
+.dash-form-group:last-of-type {
+  margin-bottom: 0;
+}
+
+.dash-form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--dash-text-muted);
+  font-size: 0.85rem;
+}
+
+.dash-form-control {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--dash-border-color);
+  background-color: var(--dash-main-bg);
+  color: var(--dash-text-color);
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease,
+    background-color 0.3s ease;
+  font-family: var(--dash-font-main);
+}
+
+.dash-form-control:focus {
+  outline: none;
+  border-color: var(--dash-primary-color);
+  box-shadow: 0 0 0 4px
+      color-mix(in srgb, var(--dash-primary-color) 20%, transparent),
+    var(--dash-shadow-sm);
+}
+
+.dash-form-control:disabled,
+.dash-form-control[readonly] {
+  background-color: color-mix(
+    in srgb,
+    var(--dash-border-color) 20%,
+    var(--dash-main-bg)
+  );
+  cursor: default;
+}
+
+/* --- Toggle Switch --- */
+.dash-notification-option {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--dash-border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.2s ease;
+}
+
+.dash-notification-option:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--dash-border-color) 20%,
+    transparent
+  );
+  margin: 0 -10px;
+  padding: 12px 10px;
+  border-radius: 6px;
+}
+
+.dash-notification-option:last-child {
+  border-bottom: none;
+}
+
+.dash-notification-option span {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--dash-text-color);
+}
+
+.dash-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+}
+
+.dash-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.dash-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  border-radius: 26px;
+}
+
+.dash-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.dash-switch input:checked + .dash-slider {
+  background-color: var(--dash-primary-color);
+}
+
+.dash-switch input:checked + .dash-slider:before {
+  transform: translateX(24px);
+}
+
+/* --- API Key Display --- */
+.dash-api-key-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* --- Account Actions --- */
+.dash-account-actions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dash-account-actions-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--dash-border-color);
+  transition: background-color 0.2s ease;
+}
+
+.dash-account-actions-list li:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--dash-border-color) 20%,
+    transparent
+  );
+  margin: 0 -10px;
+  padding: 15px 10px;
+  border-radius: 6px;
+}
+
+.dash-account-actions-list li:last-child {
+  border-bottom: none;
+}
+
+.dash-account-actions-list .action-details strong {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--dash-text-color);
+  margin-bottom: 4px;
+}
+
+.dash-account-actions-list .action-details p {
+  font-size: 0.8rem;
+  margin-bottom: 0;
+  line-height: 1.4;
+  color: var(--dash-text-muted);
+}
+
+.dash-account-actions-list li.dash-danger-zone-item .action-details strong {
+  color: var(--dash-danger-color);
+}
+
+.dash-hr {
+  border: none;
+  height: 1px;
+  background-color: var(--dash-border-color);
+  margin: 25px 0;
+}
+
+/* Button variants needed for settings */
+.dash-button-danger {
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  background-color: var(--dash-danger-color);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dash-button-danger:hover {
+  background-color: color-mix(in srgb, var(--dash-danger-color) 85%, black);
+  transform: translateY(-2px);
+}
+
+/* Delete Modal Styling */
+
+.error-border {
+  border-color: #ff4b4b !important;
+  background-color: #fffafa !important;
+}
+
+.dash-error-text {
+  color: #ff4b4b;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  display: block;
+}
+
+.settings-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  backdrop-filter: blur(3px);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.settings-modal.card {
+  background: white;
+  width: 90%;
+  max-width: 500px;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  position: relative;
+  text-align: left;
+  margin: 0;
+}
+
+.settings-close-modal {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #a0a0b0;
+}
+
+.settings-modal-title {
+  margin-top: 0;
+  font-size: 1.4rem;
+  color: #1e1e2d;
+}
+.settings-modal-text {
+  color: #666;
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+}
+.settings-modal-label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  color: #333;
+}
+.settings-modal-input {
+  margin-bottom: 25px;
+}
+
+.settings-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

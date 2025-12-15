@@ -159,8 +159,10 @@ const SubscriptionsPage = () => {
     setSelectedPlan(null);
   };
 
-  const handleConfirmUpgrade = () => {
-    // Handle upgrade logic here
+ const handleConfirmUpgrade = () => {
+    // FIX: Add alert message here
+    alert(`Successfully upgraded to ${selectedPlan.name} plan for ${selectedChatbot.title}!`);
+    
     console.log(
       `Upgrading to ${selectedPlan.name} for ${selectedChatbot.title}`
     );
@@ -179,7 +181,7 @@ const SubscriptionsPage = () => {
         </div>
 
         <div
-          className="dash-grid subscription-grid dash-grid-cols-1 md:grid-cols-2"
+          className="dash-grid subscription-grid dash-grid-cols-1" /* FIX: Removed md:grid-cols-2 to make cards full width */
           id="subscription-cards-container"
         >
           {subscriptionsData.map((chatbot) => (

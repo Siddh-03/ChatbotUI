@@ -1,3 +1,4 @@
+// src/components/dashboard/DashboardLayout.jsx
 import React from "react";
 import { useDashboard } from "../../hooks/useDashboard";
 import Sidebar from "./Sidebar";
@@ -7,11 +8,7 @@ import ChatbotWidget from "./ChatbotWidget";
 import PageLoader from "./PageLoader";
 import "../../styles/dashboard.css";
 
-const DashboardLayout = ({
-  children,
-  activePage = "dashboard",
-  userName = "Siddharth Ambaliya",
-}) => {
+const DashboardLayout = ({ children, activePage = "dashboard" }) => {
   const {
     sidebarCollapsed,
     setSidebarCollapsed,
@@ -27,7 +24,17 @@ const DashboardLayout = ({
     showLoader,
     handleChatSubmit,
     getGreeting,
+    user, // dynamic user from hook
   } = useDashboard();
+
+  // Smart toggle: close on mobile, collapse on desktop
+  const handleSidebarToggle = () => {
+    if (window.innerWidth <= 768) {
+      setSidebarMobileOpen(false);
+    } else {
+      setSidebarCollapsed(!sidebarCollapsed);
+    }
+  };
 
   return (
     <div
@@ -39,23 +46,27 @@ const DashboardLayout = ({
 
       <Sidebar
         collapsed={sidebarCollapsed}
-        onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        onToggle={handleSidebarToggle}
         activePage={activePage}
-        userName={userName}
+        userName={user?.name} // dynamic name
         greeting={getGreeting()}
       />
 
-      {/* MAIN FIX: Add sidebarCollapsed class directly to wrapper */}
       <div
         className={`dash-main-content-wrapper ${
           sidebarCollapsed ? "dash-sidebar-collapsed" : ""
         }`}
+        onClick={() => {
+          if (sidebarMobileOpen && window.innerWidth <= 768) {
+            setSidebarMobileOpen(false);
+          }
+        }}
       >
         <Header
           onMobileMenuToggle={() => setSidebarMobileOpen(!sidebarMobileOpen)}
           showProfileDropdown={showProfileDropdown}
           onProfileToggle={() => setShowProfileDropdown(!showProfileDropdown)}
-          userName={userName}
+          userName={user?.name || "User"} // same dynamic name in header
         />
 
         <main className="dash-main-content-area">{children}</main>

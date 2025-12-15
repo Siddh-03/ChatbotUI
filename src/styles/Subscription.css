@@ -44,8 +44,8 @@
 
 .subscription-plans-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
   flex-grow: 1;
 }
 
@@ -138,6 +138,66 @@
 }
 
 /* Upgrade Modal Specific */
+
+/* =========================================
+   FIX: MODAL OVERLAY STYLES
+   ========================================= */
+.modal {
+  position: fixed; /* Floats above everything */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Darkens the background */
+  display: flex;
+  justify-content: center; /* Center Horizontally */
+  align-items: center; /* Center Vertically */
+  z-index: 10000; /* Ensures it sits on top of navbar/sidebar */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  backdrop-filter: blur(4px); /* Optional: Blur effect behind modal */
+}
+
+.modal.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content.card {
+  background: white;
+  width: 90%;
+  max-width: 500px;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  position: relative;
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal.open .modal-content.card {
+  transform: translateY(0);
+}
+
+.close-modal-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #888;
+  padding: 5px;
+  transition: color 0.2s;
+  z-index: 10;
+}
+
+.close-modal-btn:hover {
+  color: #000;
+}
+
 .upgrade-modal-header-info {
   display: flex;
   align-items: center;
@@ -165,8 +225,11 @@
   color: var(--dash-text-color);
 }
 
-.plan-details {
-  padding: 20px 0;
+.plan-details div{
+    display: flex;
+    flex-direction: column;
+    align-items: center;  
+  /* padding: 20px 0; */
 }
 
 .price-display h2 {
@@ -213,7 +276,6 @@
 .payment-section .dash-button {
   flex-grow: 1;
 }
-
 
 /* FIX: Utility classes for Subscription Grid */
 .dash-grid-cols-1 {

@@ -48,6 +48,7 @@ body {
     width: 100%;
     max-width: 360px; /* Reduced from 420px for tighter look */
     padding: 35px 30px;
+    margin: 20px;
     border-radius: var(--border-radius);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
     text-align: center;

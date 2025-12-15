@@ -25,7 +25,7 @@
 .chat-layout .chat-container {
   display: flex;
   height: 100vh;
-  width: 100vw;
+  width: 100%;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-family);
@@ -561,34 +561,96 @@
 }
 
 /* Responsive */
+/* =========================================
+   FIX: MOBILE OVERLAY & RESPONSIVENESS
+   ========================================= */
+
 @media (max-width: 768px) {
-  /* sidebar already slides, just ensure it overlays above main */
+  /* Ensure Sidebar is ABOVE the overlay */
   .chat-layout .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    z-index: 2000; /* High z-index */
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    width: 280px; /* Ensure width is set */
+  }
+
+  /* Slide in when open */
+  .chat-layout .sidebar.mobile-open {
+    transform: translateX(0) !important;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+  }
+
+  /* The Overlay */
+  .chat-container.mobile-nav-open::after {
+    content: "";
     position: fixed;
     top: 0;
     left: 0;
+    width: 100%;
     height: 100%;
-    transform: translateX(-100%);
-    z-index: 110; /* above header and content */
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1500; /* Lower than sidebar */
+    opacity: 1;
+    visibility: visible;
   }
-  .chat-layout .sidebar.mobile-open {
-    transform: translateX(0);
+}
+
+/* =========================================
+   FIX: INTERMEDIATE SCREENS (Tablets / Large Phones ~570px)
+   ========================================= */
+@media (max-width: 700px) {
+  /* 1. Relax the padding so content touches edges less but doesn't squash */
+  .chat-layout .messages-list {
+    padding: 15px; /* Reduced from 30px */
   }
+
+  .chat-layout .input-area-wrapper {
+    padding: 15px; /* Reduced from 30px */
+  }
+
+  /* 2. Fix the Prompt Cards (Summarize/Code) wrapping too early */
+  .chat-layout .prompt-grid {
+    gap: 10px;
+    /* Allow columns to shrink slightly more before stacking */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  /* 3. Ensure the input container doesn't overflow */
+  .chat-layout .input-container {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* 320px Small Screen Fixes */
+@media (max-width: 374px) {
+  .chat-layout .messages-list {
+    padding: 10px; /* Reduce padding */
+  }
+
+  .chat-layout .input-area-wrapper {
+    padding: 10px 5px;
+  }
+
+  /* Compact header */
   .chat-layout .chat-header {
+    height: 55px;
     padding: 0 10px;
   }
-  /* always show mobile toggle button on small screens */
-  .chat-layout .chat-header .action-btn {
-    display: inline-flex !important;
+
+  /* Hide model name on tiny screens if needed, or make smaller */
+  .chat-layout .model-selector {
+    font-size: 0.85rem;
+    padding: 5px 8px;
   }
-  /* make messages area use full height minus header & input */
-  .chat-layout .messages-list {
-    padding: 16px;
-  }
-  .chat-layout .input-area-wrapper {
-    padding: 12px 10px;
-  }
-  .chat-layout .input-container {
-    max-width: 100%;
+
+  /* Adjust prompt cards */
+  .chat-layout .prompt-grid {
+    grid-template-columns: 1fr; /* Stack prompts vertically */
+    gap: 10px;
   }
 }

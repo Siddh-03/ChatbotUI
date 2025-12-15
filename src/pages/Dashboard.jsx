@@ -98,7 +98,7 @@ const Dashboard = () => {
   };
 
   const handleUpgradeClick = () => {
-    navigate("/subscription");
+    navigate("/subscriptions");
   };
 
   return (
@@ -146,15 +146,8 @@ const Dashboard = () => {
                   >
                     <span>
                       <FaCommentDots />
-                    </span>{" "}
+                    </span>
                     Chat
-                  </button>
-
-                  <button className="dash-button-secondary dash-button-sm">
-                    <span>
-                      <FaCircleInfo />
-                    </span>{" "}
-                    View
                   </button>
 
                   {/* Updated Upgrade Button */}
@@ -164,7 +157,7 @@ const Dashboard = () => {
                   >
                     <span>
                       <FaArrowUp />
-                    </span>{" "}
+                    </span>
                     Upgrade
                   </button>
                 </div>

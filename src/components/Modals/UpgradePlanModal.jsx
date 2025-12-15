@@ -35,31 +35,31 @@ const UpgradePlanModal = ({
             Upgrade to {selectedPlan.name} Plan
           </h3>
         </div>
+        <div>
+          <div className="plan-details">
+            <div className="price-display">
+              <h2>
+                {selectedPlan.price === 0
+                  ? "Free"
+                  : `$${selectedPlan.price}/month`}
+              </h2>
+              {selectedPlan.price > 0 && (
+                <p className="billing-info">Billed monthly, cancel anytime</p>
+              )}
+            </div>
 
-        <div className="plan-details">
-          <div className="price-display">
-            <h2>
-              {selectedPlan.price === 0
-                ? "Free"
-                : `$${selectedPlan.price}/month`}
-            </h2>
-            {selectedPlan.price > 0 && (
-              <p className="billing-info">Billed monthly, cancel anytime</p>
-            )}
+            <div className="features-list">
+              <h4>Plan includes:</h4>
+              <ul>
+                {selectedPlan.features.map((feature, index) => (
+                  <li key={index}>
+                    <span className="check-icon">✓</span>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-
-          <div className="features-list">
-            <h4>Plan includes:</h4>
-            <ul>
-              {selectedPlan.features.map((feature, index) => (
-                <li key={index}>
-                  <span className="check-icon">✓</span>
-                  {feature}
-                </li>
-              ))}
-            </ul>
-          </div>
-
           <div className="payment-section">
             <button className="dash-button" onClick={onConfirm}>
               Upgrade Now
