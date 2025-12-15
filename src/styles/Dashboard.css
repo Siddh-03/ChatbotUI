@@ -429,9 +429,9 @@ html {
   min-width: 0;
 }
 
-.dash-sidebar-collapsed .dash-main-content-wrapper {
+/* .dash-sidebar-collapsed .dash-main-content-wrapper {
   margin-left: var(--dash-sidebar-collapsed-width);
-}
+} */
 
 /* FIXED: Target the wrapper directly since the class is applied there, not on body */
 .dash-main-content-wrapper.dash-sidebar-collapsed {
@@ -617,7 +617,7 @@ html {
 /* --- Main Content Area --- */
 .dash-main-content-area {
   flex-grow: 1;
-  padding: 35px;
+  padding: 10px;
   background-color: var(--dash-main-bg);
   transition: background-color 0.3s ease;
   padding-bottom: 120px;
@@ -1263,7 +1263,7 @@ html {
 
   .dash-main-content-area {
     padding: 25px 20px 100px 20px;
-    width: 100%;
+    /* width: 100%; */
   }
 
   .dash-page-header h2 {

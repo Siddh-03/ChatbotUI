@@ -49,6 +49,7 @@ const Login = () => {
   };
 
   return (
+    <div className="auth-page-wrapper">
     <div className="auth-container">
       <div className="logo-container">
         <img src="/assist/images/ybai_shadow.png" alt="Edu AI Logo" className="logo-image" />
@@ -119,6 +120,7 @@ const Login = () => {
       <p className="switch-form-text">
         Don't have an account? <Link to="/signup" className="no-underline-force">Create an account</Link>
       </p>
+    </div>
     </div>
   );
 };

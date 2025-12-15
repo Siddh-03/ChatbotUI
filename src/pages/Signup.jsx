@@ -73,6 +73,7 @@ const Signup = () => {
   };
 
   return (
+    <div className="auth-page-wrapper">
     <div className="auth-container">
       <div className="logo-container">
         <img src="/assist/images/ybai_shadow.png" alt="Logo" className="logo-image" />
@@ -218,6 +219,7 @@ const Signup = () => {
       <p className="switch-form-text">
         Already have an account? <Link to="/login" className="no-underline-force">Sign in</Link>
       </p>
+    </div>
     </div>
   );
 };

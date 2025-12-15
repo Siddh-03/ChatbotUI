@@ -111,6 +111,7 @@ const ForgotPassword = () => {
 
   // --- Render ---
   return (
+    <div className="auth-page-wrapper">
     <div className="auth-container">
       <div className="logo-container">
         <img src="/assist/images/ybai_shadow.png" alt="Logo" className="logo-image" />
@@ -265,6 +266,7 @@ const ForgotPassword = () => {
             <p className="subtitle">Your password has been set. Redirecting...</p>
         </div>
       )}
+    </div>
     </div>
   );
 };
