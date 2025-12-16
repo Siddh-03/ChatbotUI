@@ -1,4 +1,3 @@
-// src/components/dashboard/DashboardLayout.jsx
 import React from "react";
 import { useDashboard } from "../../hooks/useDashboard";
 import Sidebar from "./Sidebar";
@@ -8,7 +7,7 @@ import ChatbotWidget from "./ChatbotWidget";
 import PageLoader from "./PageLoader";
 import "../../styles/dashboard.css";
 
-const DashboardLayout = ({ children, activePage = "dashboard" }) => {
+const DashboardLayout = ({ children }) => {
   const {
     sidebarCollapsed,
     setSidebarCollapsed,
@@ -24,7 +23,7 @@ const DashboardLayout = ({ children, activePage = "dashboard" }) => {
     showLoader,
     handleChatSubmit,
     getGreeting,
-    user, // dynamic user from hook
+    user,
   } = useDashboard();
 
   // Smart toggle: close on mobile, collapse on desktop
@@ -47,9 +46,9 @@ const DashboardLayout = ({ children, activePage = "dashboard" }) => {
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={handleSidebarToggle}
-        activePage={activePage}
-        userName={user?.name} // dynamic name
+        userName={user?.name}
         greeting={getGreeting()}
+        // activePage prop removed; Sidebar handles this internally via useLocation
       />
 
       <div
@@ -66,13 +65,14 @@ const DashboardLayout = ({ children, activePage = "dashboard" }) => {
           onMobileMenuToggle={() => setSidebarMobileOpen(!sidebarMobileOpen)}
           showProfileDropdown={showProfileDropdown}
           onProfileToggle={() => setShowProfileDropdown(!showProfileDropdown)}
-          userName={user?.name || "User"} // same dynamic name in header
+          userName={user?.name || "User"}
         />
 
         <main className="dash-main-content-area">{children}</main>
       </div>
 
-      <MobileBottomNav activePage={activePage} />
+      {/* activePage prop removed; MobileBottomNav now handles this internally */}
+      <MobileBottomNav />
 
       <ChatbotWidget
         show={showChatbot}

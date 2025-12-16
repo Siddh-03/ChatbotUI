@@ -1,6 +1,7 @@
 // src/hooks/useDashboard.js
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { authService } from "../services/authService";
 
 export const useDashboard = () => {
   const navigate = useNavigate();
@@ -49,13 +50,24 @@ export const useDashboard = () => {
   }, []);
 
   // --- Auth Actions ---
-  const login = (email, password) => {
-    if (email && password) {
+  const login = async (email, password) => {
+    try {
+      setShowLoader(true);
+      // REAL API CALL
+      await authService.login(email, password);
+
+      // If successful, update state
+      const savedUser = JSON.parse(localStorage.getItem("agentVerseUser"));
+      setUser(savedUser);
       setIsAuthenticated(true);
-      localStorage.setItem("isAuthenticated", "true");
       return true;
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert(error.response?.data?.message || "Login failed");
+      return false;
+    } finally {
+      setShowLoader(false);
     }
-    return false;
   };
 
   const signup = (userData) => {
@@ -81,7 +93,6 @@ export const useDashboard = () => {
   const logout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem("isAuthenticated");
-    console.log("Logging out... We got some trouble!");
     navigate("/login");
   };
 

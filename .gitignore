@@ -27,3 +27,5 @@ public/assist/videos/story.mp4
 
 src/pages/Conversations.jsx
 src/styles/Conversations.css
+
+.env

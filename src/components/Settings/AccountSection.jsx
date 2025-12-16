@@ -1,67 +1,46 @@
 import React, { useState } from "react";
-import { createPortal } from "react-dom"; // IMPORT THIS
+import { createPortal } from "react-dom";
 import SettingsCard from "./SettingsCard";
 import { FaTimes } from "react-icons/fa";
+import { authService } from "../../services/authService"; // Import Service
+import { useDashboard } from "../../hooks/useDashboard";
+import DeleteModal from "./DeleteModal";
+
 
 const AccountSection = () => {
+  const { logout } = useDashboard();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleDelete = () => {
-    alert("Account permanently deleted.");
-    setShowDeleteModal(false);
-    setDeleteConfirmation("");
+  // --- HANDLER: DEACTIVATE ---
+  const handleDeactivate = async () => {
+    if (window.confirm("Are you sure you want to deactivate your account? You will be logged out.")) {
+      try {
+        await authService.deactivateAccount();
+        alert("Account deactivated. Goodbye!");
+        logout(); // Auto logout
+      } catch (error) {
+        alert("Failed to deactivate account. Please try again.");
+        console.error(error);
+      }
+    }
   };
 
-  // The Modal Component (Teleported)
-  const DeleteModal = () => (
-    <div className="settings-modal-overlay">
-      <div className="settings-modal card">
-        <button
-          className="settings-close-modal"
-          onClick={() => setShowDeleteModal(false)}
-        >
-          <FaTimes />
-        </button>
-        <h3 className="settings-modal-title">Permanently Delete Account</h3>
-        <p className="settings-modal-text">
-          This action is irreversible. All your data will be permanently erased.
-        </p>
-        <label className="settings-modal-label">
-          To confirm, please type "<strong>Delete my account</strong>" below:
-        </label>
-        <input
-          type="text"
-          className="dash-form-control settings-modal-input"
-          placeholder='Type "Delete my account"'
-          value={deleteConfirmation}
-          onChange={(e) => setDeleteConfirmation(e.target.value)}
-        />
-        <div className="settings-modal-actions">
-          <button
-            className="dash-button-secondary"
-            onClick={() => setShowDeleteModal(false)}
-          >
-            Cancel
-          </button>
-          <button
-            className="dash-button-danger"
-            disabled={deleteConfirmation !== "Delete my account"}
-            onClick={handleDelete}
-            style={{
-              opacity: deleteConfirmation !== "Delete my account" ? 0.5 : 1,
-              cursor:
-                deleteConfirmation !== "Delete my account"
-                  ? "not-allowed"
-                  : "pointer",
-            }}
-          >
-            Delete My Account
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+  // --- HANDLER: DELETE ---
+  const handleDelete = async () => {
+    setLoading(true);
+    try {
+      await authService.deleteAccount();
+      alert("Your account has been permanently deleted.");
+      setShowDeleteModal(false);
+      logout(); // Auto logout
+    } catch (error) {
+      alert("Failed to delete account. Please contact support.");
+      console.error(error);
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -77,7 +56,10 @@ const AccountSection = () => {
               <strong>Deactivate Account</strong>
               <p>Temporarily suspend your account.</p>
             </div>
-            <button className="dash-button-secondary dash-button-sm">
+            <button 
+              className="dash-button-secondary dash-button-sm"
+              onClick={handleDeactivate}
+            >
               <i className="fas fa-power-off"></i> Deactivate
             </button>
           </li>
@@ -96,8 +78,14 @@ const AccountSection = () => {
         </ul>
       </SettingsCard>
 
-      {/* RENDER MODAL VIA PORTAL */}
-      {showDeleteModal && createPortal(<DeleteModal />, document.body)}
+      {showDeleteModal && createPortal(<DeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDelete}
+        loading={loading}
+        deleteConfirmation={deleteConfirmation}
+        setDeleteConfirmation={setDeleteConfirmation}
+      />, document.body)}
     </>
   );
 };

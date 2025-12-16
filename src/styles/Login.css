@@ -1,256 +1,278 @@
-/* =========================================
-   1. FONTS & VARIABLES
-   ========================================= */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
-:root {
-    --font-main: 'Inter', sans-serif;
-    --primary-color: #6A5AE0;
-    --primary-hover: #5A4AE0;
-    --text-color: #1E1E2D;
-    --text-muted: #A0A0B0;
-    --border-color: #E0E0E0;
-    --bg-body: #F5F7FA;
-    --bg-card: #FFFFFF;
-    --error-color: #FF4B4B;
-    --success-color: #27AE60;
-    --border-radius: 12px;
-}
-
-/* =========================================
-   2. PAGE LAYOUT
-   ========================================= */
-body {
-    margin: 0;
-    font-family: var(--font-main);
-    background-color: var(--bg-body);
-    /* Ensure this image path is correct in your project */
-    background-image: url('/assist/images/background.png');
-    background-size: cover;
-    background-position: center;
-    min-height: 100vh;
-    /* display: flex;
-    align-items: center;
-    justify-content: center; */
-}
-
-/* FIX: New wrapper to center auth pages since we removed it from body */
 .auth-page-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  font-family: var(--font-main);
+  background-color: var(--bg-body);
+  background-image: url("/assist/images/background.png");
+  background-size: cover;
+  background-position: center;
+
+  /* Ensure it sits on top of any global styles */
+  position: relative;
+  z-index: 1;
 }
 
 .auth-container {
-    background-color: var(--bg-card);
-    width: 100%;
-    max-width: 360px; /* Reduced from 420px for tighter look */
-    padding: 35px 30px;
-    margin: 20px;
-    border-radius: var(--border-radius);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-    text-align: center;
-    position: relative;
+  background-color: var(--bg-card);
+  width: 100%;
+  max-width: 360px;
+  padding: 35px 30px;
+  margin: 20px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  position: relative;
 }
 
 /* =========================================
-   3. TYPOGRAPHY & HEADER
+   TYPOGRAPHY & HEADER
    ========================================= */
-.logo-container { margin-bottom: 20px; }
-.logo-image { width: 50px; height: 50px; object-fit: contain; }
+.logo-container {
+  margin-bottom: 20px;
+}
+.logo-image {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
 
 h1 {
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin: 0 0 10px 0;
-    color: var(--text-color);
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  color: var(--text-color);
 }
 
 .subtitle {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    line-height: 1.4;
-    margin-bottom: 25px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin-bottom: 25px;
 }
 
 /* =========================================
-   4. INPUTS & ERRORS
+   INPUTS & ERRORS
    ========================================= */
-.form-group { margin-bottom: 18px; text-align: left; }
-
-.form-group label {
-    display: block;
-    font-weight: 600;
-    font-size: 0.85rem;
-    margin-bottom: 6px;
-    color: var(--text-color);
+.form-group {
+  margin-bottom: 18px;
+  text-align: left;
 }
 
-.input-wrapper { position: relative; }
+.form-group label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+  color: var(--text-color);
+}
 
-/* Icons */
+.input-wrapper {
+  position: relative;
+}
+
 .input-icon {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #A0A0B0;
-    font-size: 1rem;
-    z-index: 5;
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a0a0b0;
+  font-size: 1rem;
+  z-index: 5;
 }
 
 .password-toggle-icon {
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #A0A0B0;
-    cursor: pointer;
-    z-index: 5;
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a0a0b0;
+  cursor: pointer;
+  z-index: 5;
 }
 
 /* Base Input Style */
 input[type="email"],
 input[type="password"],
-input[type="text"] ,
+input[type="text"],
 input[type="tel"] {
-    width: 100%;
-    padding: 12px 14px 12px 42px; /* Left padding makes room for icon */
-    border-radius: 8px;
-    border: 1.5px solid var(--border-color);
-    background-color: #fff;
-    color: var(--text-color);
-    font-size: 0.95rem;
-    font-weight: 500;
-    outline: none;
-    box-sizing: border-box;
-    transition: all 0.2s;
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border-color);
+  background-color: #fff;
+  color: var(--text-color);
+  font-size: 0.95rem;
+  font-weight: 500;
+  outline: none;
+  box-sizing: border-box;
+  transition: all 0.2s;
 }
 
 input:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(106, 90, 224, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(106, 90, 224, 0.1);
 }
 
-/* ERROR STATE - Using !important to force override browser styles */
 input.input-error {
-    border-color: var(--error-color) !important;
-    background-color: #FFF9F9 !important;
+  border-color: var(--error-color) !important;
+  background-color: #fff9f9 !important;
 }
 
 .error-text {
-    color: var(--error-color);
-    font-size: 0.75rem;
-    margin-top: 5px;
-    text-align: left;
-    display: block;
+  color: var(--error-color);
+  font-size: 0.75rem;
+  margin-top: 5px;
+  text-align: left;
+  display: block;
 }
 
 /* =========================================
-   5. OTP INPUTS (FIXED VISIBILITY)
+   OTP INPUTS
    ========================================= */
 .otp-container {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin: 25px 0;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 25px 0;
 }
 
 .otp-box {
-    width: 45px !important;
-    height: 50px !important;
-    padding: 0 !important; /* Removing padding prevents text from being pushed out */
-    text-align: center;
-    font-size: 1.2rem !important;
-    font-weight: 700;
-    color: #1E1E2D !important;
-    background: #FFFFFF !important;
-    border: 2px solid #E0E0E0 !important;
-    border-radius: 8px;
-    outline: none;
+  width: 45px !important;
+  height: 50px !important;
+  padding: 0 !important;
+  text-align: center;
+  font-size: 1.2rem !important;
+  font-weight: 700;
+  color: #1e1e2d !important;
+  background: #ffffff !important;
+  border: 2px solid #e0e0e0 !important;
+  border-radius: 8px;
+  outline: none;
 }
 
 .otp-box:focus {
-    border-color: var(--primary-color) !important;
-    transform: translateY(-2px);
+  border-color: var(--primary-color) !important;
+  transform: translateY(-2px);
 }
 
 /* =========================================
-   6. BUTTONS & ACTIONS
+   BUTTONS & ACTIONS
    ========================================= */
 .btn-primary {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    background-color: var(--primary-color);
-    color: white;
-    font-weight: 600;
-    font-size: 1rem;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    margin-top: 5px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 5px;
 }
 
-.btn-primary:hover { background-color: var(--primary-hover); }
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
 
 .password-options {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    font-size: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 0.85rem;
 }
 
-.remember-me { display: flex; align-items: center; gap: 6px; color: var(--text-muted); cursor: pointer; }
-.remember-me input { width: 15px; height: 15px; accent-color: var(--primary-color); }
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.remember-me input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--primary-color);
+}
 
-.forgot-password, .no-underline-force {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: 600;
+.forgot-password,
+.no-underline-force {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
 }
 
 .switch-form-text {
-    margin-top: 20px;
-    color: var(--text-muted);
-    font-size: 0.9rem;
+  margin-top: 20px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
 }
 
-/* Go Back Button */
 .go-back-link {
-    display: block;
-    margin-top: 20px;
-    color: #A0A0B0; /* Muted grey */
-    font-size: 0.9rem;
-    text-decoration: none;
-    cursor: pointer;
-    font-weight: 500;
-    transition: color 0.2s;
+  display: block;
+  margin-top: 20px;
+  color: #a0a0b0;
+  font-size: 0.9rem;
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: color 0.2s;
 }
 
 .go-back-link:hover {
-    color: var(--text-color);
+  color: var(--text-color);
 }
 
 /* =========================================
-   7. EXTRAS (Dots, Criteria, Success)
+   EXTRAS
    ========================================= */
-.progress-dots { display: flex; justify-content: center; gap: 6px; margin-bottom: 25px; }
-.dot { width: 8px; height: 8px; background-color: #E0E0E0; border-radius: 50%; transition: 0.3s; }
-.dot.active { background-color: var(--primary-color); width: 8px; border-radius: 50%; }
+.progress-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 25px;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+.dot.active {
+  background-color: var(--primary-color);
+  width: 8px;
+  border-radius: 50%;
+}
 
-.timer-text { color: #F39C12; font-weight: 600; font-size: 0.9rem; margin-bottom: 15px; }
+.timer-text {
+  color: #f39c12;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+}
 
 .password-criteria {
-    background: #F9F9F9;
-    padding: 15px;
-    border-radius: 8px;
-    text-align: left;
-    list-style: none;
-    margin: 15px 0;
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: left;
+  list-style: none;
+  margin: 15px 0;
 }
-.password-criteria li { font-size: 0.8rem; color: #A0A0B0; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
-.password-criteria li.valid { color: var(--success-color); }
+.password-criteria li {
+  font-size: 0.8rem;
+  color: #a0a0b0;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.password-criteria li.valid {
+  color: var(--success-color);
+}

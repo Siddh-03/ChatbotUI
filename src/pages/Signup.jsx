@@ -1,9 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/Login.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useDashboard } from "../hooks/useDashboard";
 
 const Signup = () => {
+
+  useEffect(() => {
+    document.title = "Signup | AgentVerse";
+  }, []);
+
   const navigate = useNavigate();
   const { signup } = useDashboard();
 

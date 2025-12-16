@@ -2,13 +2,8 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   FaRobot,
-  FaRegComments,
   FaRegCreditCard,
-  FaChartPie,
   FaCog,
-  FaBook,
-  FaLifeRing,
-  FaConciergeBell,
   FaAngleLeft,
   FaAngleRight,
   FaUserAstronaut,
@@ -52,16 +47,6 @@ const Sidebar = ({ collapsed, onToggle, userName, greeting }) => {
               <span className="dash-nav-text">AI Chatbots</span>
             </Link>
           </li>
-
-          {/* Example for Conversations (Commented out in your snippet but included structure) */}
-          {/* <li className={isActive("/conversations")}>
-            <Link to="/conversations">
-              <span className="dash-nav-icon"><FaRegComments /></span>
-              <span className="dash-nav-text">Conversations</span>
-              <span className="dash-badge">3</span>
-            </Link>
-          </li> */}
-
           <li className={isActive("/subscriptions")}>
             <Link to="/subscriptions">
               <span className="dash-nav-icon">
@@ -70,13 +55,6 @@ const Sidebar = ({ collapsed, onToggle, userName, greeting }) => {
               <span className="dash-nav-text">Subscriptions</span>
             </Link>
           </li>
-
-          {/* <li className={isActive("/analytics")}>
-            <Link to="/analytics">
-              <span className="dash-nav-icon"><FaChartPie /></span>
-              <span className="dash-nav-text">Analytics</span>
-            </Link>
-          </li> */}
 
           <li className={isActive("/settings")}>
             <Link to="/settings">
@@ -88,13 +66,6 @@ const Sidebar = ({ collapsed, onToggle, userName, greeting }) => {
           </li>
 
           <li className="dash-nav-divider"></li>
-
-          {/* <li className={isActive("/documentation")}>
-            <Link to="/documentation">
-              <span className="dash-nav-icon"><FaBook /></span>
-              <span className="dash-nav-text">Documentation</span>
-            </Link>
-          </li> */}
         </ul>
       </nav>
 

@@ -1,0 +1,84 @@
+:root {
+  /* --- GLOBAL TYPOGRAPHY --- */
+  --font-main: "Inter", sans-serif;
+  --dash-font-main: var(--font-main);
+
+  /* --- DASHBOARD THEME (Prefix: --dash-) --- */
+  /* Light Theme Colors */
+  --dash-bg-color: #f4f7f9;
+  --dash-sidebar-bg: rgba(255, 255, 255, 0.7);
+  --dash-sidebar-border: rgba(0, 0, 0, 0.07);
+  --dash-main-bg: #f8faff;
+  --dash-card-bg: #ffffff;
+  --dash-text-color: #0a192f;
+  --dash-text-muted: #5a677b;
+  --dash-border-color: #e0e6ed;
+
+  /* Brand Colors */
+  --dash-primary-color: #0052cc;
+  --dash-primary-hover: #0040a0;
+  --dash-primary-light: #dfefff;
+  --dash-secondary-color: #27ae60;
+  --dash-secondary-hover: #1f8b4c;
+  --dash-secondary-light: #e3fcef;
+
+  /* Status Colors */
+  --dash-danger-color: #e74c3c;
+  --dash-danger-light: #ffebe6;
+  --dash-warning-color: #f39c12;
+  --dash-warning-light: #fff0b3;
+  --dash-info-color: #3498db;
+  --dash-info-light: #e1f3ff;
+  --dash-purple-color: #8e44ad;
+  --dash-icon-color: #6b7280;
+  --dash-icon-active-color: var(--dash-primary-color);
+
+  /* Effects */
+  --dash-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --dash-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
+  --dash-shadow-md: 0 4px 8px -2px rgba(0, 0, 0, 0.06),
+    0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --dash-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --dash-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --dash-backdrop-blur: 10px;
+
+  /* Layout */
+  --dash-sidebar-width: 260px;
+  --dash-sidebar-collapsed-width: 80px;
+  --dash-header-height: 65px;
+
+  /* Gradients */
+  --dash-animated-bg-gradient: linear-gradient(
+    -45deg,
+    var(--dash-primary-light),
+    #e6f7ff,
+    var(--dash-secondary-light),
+    #f0fff0
+  );
+  --dash-card-shine-gradient: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 20%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 80%
+  );
+  --dash-button-shine-gradient: linear-gradient(
+    110deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.25) 50%,
+    transparent 80%
+  );
+
+  /* --- AUTH / LOGIN THEME (No Prefix) --- */
+  --primary-color: #6a5ae0;
+  --primary-hover: #5a4ae0;
+  --text-color: #1e1e2d;
+  --text-muted: #a0a0b0;
+  --border-color: #e0e0e0;
+  --bg-body: #f5f7fa;
+  --bg-card: #ffffff;
+  --error-color: #ff4b4b;
+  --success-color: #27ae60;
+  --border-radius: 12px;
+}

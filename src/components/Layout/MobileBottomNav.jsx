@@ -1,9 +1,8 @@
 import React from "react";
-import { useNavigate } from "react-router-dom"; // 1. Import hook
+import { useNavigate, useLocation } from "react-router-dom";
 import { FaRobot, FaRegCreditCard } from "react-icons/fa6";
 
 const navItems = [
-  // 2. Add 'path' property
   { id: "dashboard", label: "Chatbots", icon: FaRobot, path: "/dashboard" },
   {
     id: "subscriptions",
@@ -13,8 +12,9 @@ const navItems = [
   },
 ];
 
-const MobileBottomNav = ({ activePage }) => {
-  const navigate = useNavigate(); // 3. Initialize hook
+const MobileBottomNav = () => {
+  const navigate = useNavigate();
+  const location = useLocation(); // Gets current URL path
 
   return (
     <nav className="dash-mobile-bottom-nav">
@@ -22,13 +22,14 @@ const MobileBottomNav = ({ activePage }) => {
         {navItems.map((item) => (
           <li
             key={item.id}
-            className={activePage === item.id ? "dash-active" : ""}
+            // Checks if the current URL matches the item's path
+            className={location.pathname === item.path ? "dash-active" : ""}
           >
             <a
               href="#"
               onClick={(e) => {
                 e.preventDefault();
-                navigate(item.path); // 4. Navigate on click
+                navigate(item.path);
               }}
             >
               <span>

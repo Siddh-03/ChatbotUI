@@ -1,10 +1,9 @@
 /* =========================================
    1. VARIABLES (Forced Light Theme)
    ========================================= */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
 
 .chat-layout {
-  --font-family: "Inter", sans-serif;
+  --font-family: var(--font-main); /* Uses global font */
   --bg-primary: #ffffff;
   --bg-secondary: #f8f9fa;
   --bg-tertiary: #e9ecef;
@@ -20,7 +19,7 @@
 }
 
 /* =========================================
-   2. LAYOUT
+   LAYOUT
    ========================================= */
 .chat-layout .chat-container {
   display: flex;

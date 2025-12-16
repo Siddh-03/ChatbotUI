@@ -1,17 +1,18 @@
-import React, { useState } from "react";
+import React from "react";
 import SettingsCard from "./SettingsCard";
+import { authService } from "../../services/authService";
 
 const DataPrivacySection = () => {
-  const [retention, setRetention] = useState("90 Days");
-
-  const handleExport = () => {
-    alert("Preparing your data export... You will receive an email shortly.");
-  };
-
-  const handleRetentionChange = (e) => {
-    setRetention(e.target.value);
-    // You would typically save this preference to the backend here
-    console.log(`Retention period updated to: ${e.target.value}`);
+  const handleExport = async () => {
+    try {
+      alert("Preparing your data export... This might take a moment.");
+      // In a real app, this would get a Blob and trigger a file download
+      // For now, we simulate the API call
+      await authService.exportData();
+      alert("Your data has been emailed to you!");
+    } catch (error) {
+      console.log("Export triggered (Mock)");
+    }
   };
 
   return (
@@ -28,8 +29,7 @@ const DataPrivacySection = () => {
         <select
           id="settings-data-retention"
           className="dash-form-control"
-          value={retention}
-          onChange={handleRetentionChange}
+          defaultValue="90 Days"
           style={{ cursor: "pointer" }}
         >
           <option>Keep Indefinitely</option>

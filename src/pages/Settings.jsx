@@ -1,4 +1,5 @@
 import React from "react";
+import { useEffect } from "react";
 import DashboardLayout from "../components/Layout/DashboardLayout";
 import ProfileSection from "../components/Settings/ProfileSection";
 import SecuritySection from "../components/Settings/SecuritySection";
@@ -11,6 +12,10 @@ import "../styles/Settings.css";
 
 const Settings = () => {
   const { user } = useDashboard();
+
+  useEffect(() => {
+    document.title = "Settings | AgentVerse";
+  }, []);
 
   return (
     <DashboardLayout activePage="settings" userName={user?.name || "User"}>
