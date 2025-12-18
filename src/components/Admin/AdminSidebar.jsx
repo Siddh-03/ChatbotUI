@@ -4,11 +4,11 @@ import {
   FaUserShield,
   FaUsers,
   FaRobot,
-  FaClipboardList,
   FaCreditCard,
   FaComments,
   FaSignOutAlt,
-  FaBars,
+  FaAngleLeft,
+  FaAngleRight,
 } from "react-icons/fa";
 import { adminService } from "../../services/adminService";
 
@@ -20,39 +20,21 @@ const AdminSidebar = ({ collapsed, onToggle }) => {
   return (
     <aside className={`dash-sidebar ${collapsed ? "dash-collapsed" : ""}`}>
       {/* HEADER */}
-      <div
-        className="dash-sidebar-header"
-        style={{ padding: collapsed ? "20px 0" : "20px" }}
-      >
-        <div
-          className="dash-logo-container"
-          style={{ justifyContent: collapsed ? "center" : "flex-start" }}
-        >
-          <FaUserShield
-            className="dash-logo-icon"
-            style={{
-              fontSize: "1.8rem",
-              color: "var(--dash-primary-color)",
-              margin: 0,
-            }}
-          />
-          {!collapsed && (
-            <h2 className="dash-logo-text" style={{ marginLeft: "10px" }}>
-              Admin
-            </h2>
-          )}
+      <div className="dash-sidebar-header">
+        <div className="dash-logo-container">
+          <div className="dash-logo-icon">
+            <FaUserShield
+              style={{
+                fontSize: "1.8rem",
+                color: "var(--dash-primary-color)",
+              }}
+            />
+          </div>
+          <h2 className="dash-logo-text">Admin</h2>
         </div>
-        {/* Only show toggle button inside sidebar on Mobile. On Desktop, it's usually in the header. 
-            But if you want it here: */}
-        {!collapsed && (
-          <button
-            className="dash-sidebar-toggle-btn"
-            onClick={onToggle}
-            style={{ marginLeft: "auto" }}
-          >
-            <FaBars />
-          </button>
-        )}
+        <button className="dash-sidebar-toggle-btn" onClick={onToggle}>
+          {collapsed ? <FaAngleRight /> : <FaAngleLeft />}
+        </button>
       </div>
 
       {/* NAV */}
@@ -103,10 +85,13 @@ const AdminSidebar = ({ collapsed, onToggle }) => {
             justifyContent: "center",
             display: "flex",
             gap: "10px",
+            whiteSpace: "nowrap",
+            padding: collapsed ? "14px 0" : "14px 25px",
           }}
+          title="Logout"
         >
           <FaSignOutAlt />
-          <span>Logout</span>
+          {!collapsed && <span>Logout</span>}
         </button>
       </div>
     </aside>
