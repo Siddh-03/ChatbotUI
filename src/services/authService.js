@@ -19,7 +19,7 @@ export const authService = {
   // 1. Register User (Root Level)
   signup: async (userData) => {
     // URL becomes: /backend/register/ -> http://server.com/register/
-    const response = await api.post("/register/", userData);
+    const response = await api.post("/register", userData);
     return response.data;
   },
 

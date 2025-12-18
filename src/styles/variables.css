@@ -14,13 +14,14 @@
   --dash-text-muted: #5a677b;
   --dash-border-color: #e0e6ed;
 
-  /* Brand Colors */
-  --dash-primary-color: #0052cc;
-  --dash-primary-hover: #0040a0;
-  --dash-primary-light: #dfefff;
+  /* --- BRAND COLORS (Updated to #76A194) --- */
+  --dash-primary-color: #76A194;        /* The Main Color */
+  --dash-primary-hover: #5e8578;        /* Darker version for hover */
+  --dash-primary-light: #e3f0ec;        /* Lighter background version */
+  
   --dash-secondary-color: #27ae60;
-  --dash-secondary-hover: #1f8b4c;
-  --dash-secondary-light: #e3fcef;
+  --dash-danger-color: #e74c3c;
+  --dash-warning-color: #f39c12;
 
   /* Status Colors */
   --dash-danger-color: #e74c3c;
@@ -71,14 +72,16 @@
   );
 
   /* --- AUTH / LOGIN THEME (No Prefix) --- */
-  --primary-color: #6a5ae0;
-  --primary-hover: #5a4ae0;
+  --primary-color: #76A194;             /* The Main Color */
+  --primary-hover: #5e8578;
   --text-color: #1e1e2d;
   --text-muted: #a0a0b0;
   --border-color: #e0e0e0;
-  --bg-body: #f5f7fa;
+ --bg-body: #f5f7fa;
   --bg-card: #ffffff;
   --error-color: #ff4b4b;
   --success-color: #27ae60;
   --border-radius: 12px;
+
+  
 }

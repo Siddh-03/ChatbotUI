@@ -80,9 +80,7 @@ const Signup = () => {
           response.status === "success" ||
           response.message?.includes("success")
         ) {
-          // If API requires verification, you might redirect to a verify page here
-          alert("Registration Successful! Please Login.");
-          navigate("/login");
+          navigate("/verify-email", { state: { email: formData.email } });
         } else {
           // Handle API failure message
           setErrors({ email: response.message || "Registration failed" });

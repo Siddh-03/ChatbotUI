@@ -3,162 +3,223 @@ import { adminService } from "../../services/adminService";
 
 const PlanManagement = () => {
   const [plans, setPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({
-    plan_name: "",
+
+  const [formData, setFormData] = useState({
+    name: "",
     price: "",
-    credits: "",
-    duration: 30,
-    storage: 100,
-    discount: 0,
+    features: "",
   });
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    loadPlans();
+    // Mock data for now or fetch from API
+    setPlans([
+      { id: 1, name: "Free", price: "$0", features: ["Basic Chat", "1 Bot"] },
+      {
+        id: 2,
+        name: "Pro",
+        price: "$29",
+        features: ["Unlimited Chat", "5 Bots"],
+      },
+    ]);
+    setLoading(false);
   }, []);
 
-  const loadPlans = async () => {
-    const res = await adminService.getAllPlans();
-    if (res.data.status === "success") setPlans(res.data.data);
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.name) newErrors.name = "Plan Name is required";
+    if (!formData.price) newErrors.price = "Price is required";
+    if (!formData.features) newErrors.features = "Add at least one feature";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const handleCreate = async (e) => {
-    e.preventDefault();
-    await adminService.createPlan(form);
+  const handleCreate = async () => {
+    if (!validate()) return;
+
+    // Convert comma string to array
+    const newPlan = {
+      ...formData,
+      features: formData.features.split(",").map((f) => f.trim()),
+    };
+
+    // Call API here (mocking for now)
+    setPlans([...plans, { id: Date.now(), ...newPlan }]);
     setShowModal(false);
-    loadPlans();
+    setFormData({ name: "", price: "", features: "" });
   };
 
   return (
-    <div className="dash-page-content dash-active">
+    <div style={{ padding: "20px" }}>
       <div
-        className="dash-page-header"
-        style={{ display: "flex", justifyContent: "space-between" }}
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "20px",
+        }}
       >
-        <div>
-          <h2>Subscription Plans</h2>
-          <p>Manage pricing tiers</p>
-        </div>
-        <button className="dash-button" onClick={() => setShowModal(true)}>
-          + New Plan
+        <h2>Subscription Plans</h2>
+        <button
+          className="btn-primary"
+          onClick={() => setShowModal(true)}
+          style={{ width: "auto" }}
+        >
+          + Create Plan
         </button>
       </div>
 
-      <div className="dash-grid dash-grid-3">
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+          gap: "20px",
+        }}
+      >
         {plans.map((plan) => (
           <div
-            key={plan.plan_id}
-            className="dash-card"
-            style={{ textAlign: "center" }}
+            key={plan.id}
+            style={{
+              background: "white",
+              padding: "25px",
+              borderRadius: "12px",
+              border: "1px solid #eee",
+              textAlign: "center",
+            }}
           >
-            <h3 style={{ color: "var(--dash-primary-color)" }}>
-              {plan.plan_name}
-            </h3>
-            <h1 style={{ fontSize: "2.5rem", margin: "10px 0" }}>
-              ${plan.price}
-            </h1>
-            <p style={{ color: "var(--dash-text-muted)" }}>
-              {plan.credits} Credits / {plan.duration} Days
-            </p>
-            <hr className="dash-hr" />
-            <button
-              className="dash-button-sm dash-button-danger"
-              onClick={async () => {
-                if (confirm("Delete this plan?")) {
-                  await adminService.deletePlan(plan.plan_id);
-                  loadPlans();
-                }
+            <h3>{plan.name}</h3>
+            <h2 style={{ color: "var(--primary-color)", margin: "10px 0" }}>
+              {plan.price}
+            </h2>
+            <ul
+              style={{
+                listStyle: "none",
+                padding: 0,
+                textAlign: "left",
+                margin: "20px 0",
               }}
             >
-              Delete Plan
-            </button>
+              {Array.isArray(plan.features) &&
+                plan.features.map((f, i) => (
+                  <li key={i} style={{ marginBottom: "8px" }}>
+                    ✓ {f}
+                  </li>
+                ))}
+            </ul>
           </div>
         ))}
       </div>
 
       {showModal && (
-        <div
-          className="dash-modal-overlay dash-open"
-          style={{ display: "flex" }}
-        >
-          <div className="dash-modal-content">
-            <h3>New Subscription Plan</h3>
-            <form onSubmit={handleCreate}>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: "15px",
-                }}
-              >
-                <div className="dash-form-group">
-                  <label>Plan Name</label>
-                  <input
-                    className="dash-form-control"
-                    value={form.plan_name}
-                    onChange={(e) =>
-                      setForm({ ...form, plan_name: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="dash-form-group">
-                  <label>Price ($)</label>
-                  <input
-                    type="number"
-                    className="dash-form-control"
-                    value={form.price}
-                    onChange={(e) =>
-                      setForm({ ...form, price: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="dash-form-group">
-                  <label>Credits</label>
-                  <input
-                    type="number"
-                    className="dash-form-control"
-                    value={form.credits}
-                    onChange={(e) =>
-                      setForm({ ...form, credits: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="dash-form-group">
-                  <label>Duration (Days)</label>
-                  <input
-                    type="number"
-                    className="dash-form-control"
-                    value={form.duration}
-                    onChange={(e) =>
-                      setForm({ ...form, duration: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
+        <div style={modalOverlayStyle}>
+          <div style={modalContentStyle}>
+            <h3>Add Subscription Plan</h3>
+
+            <div style={{ marginBottom: "15px" }}>
+              <label>Plan Name</label>
+              <input
+                style={inputStyle}
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                placeholder="e.g. Enterprise"
+              />
+              {errors.name && <span style={errorStyle}>{errors.name}</span>}
+            </div>
+
+            <div style={{ marginBottom: "15px" }}>
+              <label>Price</label>
+              <input
+                style={inputStyle}
+                value={formData.price}
+                onChange={(e) =>
+                  setFormData({ ...formData, price: e.target.value })
+                }
+                placeholder="e.g. $49"
+              />
+              {errors.price && <span style={errorStyle}>{errors.price}</span>}
+            </div>
+
+            <div style={{ marginBottom: "20px" }}>
+              <label>Features (Comma separated)</label>
+              <textarea
+                style={{ ...inputStyle, height: "80px" }}
+                value={formData.features}
+                onChange={(e) =>
+                  setFormData({ ...formData, features: e.target.value })
+                }
+                placeholder="24/7 Support, Unlimited Bots, API Access"
+              />
+              {errors.features && (
+                <span style={errorStyle}>{errors.features}</span>
+              )}
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "10px",
+              }}
+            >
               <button
-                type="submit"
-                className="dash-button"
-                style={{ width: "100%", marginTop: "15px" }}
-              >
-                Create Plan
-              </button>
-              <button
-                type="button"
-                className="dash-button-secondary"
-                style={{ width: "100%", marginTop: "10px" }}
                 onClick={() => setShowModal(false)}
+                style={cancelBtnStyle}
               >
                 Cancel
               </button>
-            </form>
+              <button
+                onClick={handleCreate}
+                className="btn-primary"
+                style={{ width: "auto" }}
+              >
+                Create Plan
+              </button>
+            </div>
           </div>
         </div>
       )}
     </div>
   );
+};
+
+// Reuse the same styles from BotManagement
+const modalOverlayStyle = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(0,0,0,0.5)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 1000,
+};
+const modalContentStyle = {
+  backgroundColor: "white",
+  padding: "30px",
+  borderRadius: "16px",
+  width: "90%",
+  maxWidth: "450px",
+};
+const inputStyle = {
+  width: "100%",
+  padding: "10px",
+  borderRadius: "8px",
+  border: "1px solid #ddd",
+  marginTop: "5px",
+  boxSizing: "border-box",
+};
+const errorStyle = { color: "red", fontSize: "0.8rem" };
+const cancelBtnStyle = {
+  background: "none",
+  border: "1px solid #ddd",
+  padding: "10px 20px",
+  borderRadius: "8px",
+  cursor: "pointer",
 };
 
 export default PlanManagement;

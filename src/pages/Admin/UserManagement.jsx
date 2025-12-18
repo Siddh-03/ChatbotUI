@@ -1,42 +1,94 @@
 import React, { useState, useEffect } from "react";
 import { adminService } from "../../services/adminService";
 
+const MOCK_USERS = [
+  {
+    user_id: 1,
+    name: "Siddhartha",
+    email: "sid@example.com",
+    phone_number: "9876543210",
+    is_active: true,
+  },
+  {
+    user_id: 2,
+    name: "Boss Man",
+    email: "boss@agentverse.com",
+    phone_number: "1231231234",
+    is_active: true,
+  },
+  {
+    user_id: 3,
+    name: "Spammer",
+    email: "spam@fake.com",
+    phone_number: "0000000000",
+    is_active: false,
+  },
+];
+
 const UserManagement = () => {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState(MOCK_USERS); // mock data by default
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchUsers();
+    // show mock data instantly, then try real API
+    const timer = setTimeout(() => {
+      fetchUsers();
+    }, 500); // simulate like your second file
+
+    return () => clearTimeout(timer);
   }, []);
 
   const fetchUsers = async () => {
     try {
       const res = await adminService.getAllUsers();
-      if (res.data.status === "success") {
+      if (res.data.status === "success" && Array.isArray(res.data.data)) {
         setUsers(res.data.data);
       }
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error("Error fetching users, keeping mock data:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleToggleStatus = async (user) => {
-    // Optimistic UI Update
     const newStatus = !user.is_active;
+
+    // Optimistic UI
+    setUsers((prev) =>
+      prev.map((u) =>
+        u.user_id === user.user_id ? { ...u, is_active: newStatus } : u
+      )
+    );
+
     try {
       await adminService.updateUser({
         user_id: user.user_id,
         is_active: newStatus,
       });
-      setUsers(
-        users.map((u) =>
-          u.user_id === user.user_id ? { ...u, is_active: newStatus } : u
-        )
-      );
     } catch (e) {
       alert("Failed to update status");
+      // rollback on failure
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.user_id === user.user_id ? { ...u, is_active: !newStatus } : u
+        )
+      );
+    }
+  };
+
+  const handleDelete = async (user) => {
+    if (!window.confirm("Delete this user permanently?")) return;
+
+    // Optimistic delete
+    const prevUsers = users;
+    setUsers((prev) => prev.filter((u) => u.user_id !== user.user_id));
+
+    try {
+      await adminService.deleteUser(user.user_id);
+    } catch (e) {
+      alert("Failed to delete user");
+      setUsers(prevUsers);
     }
   };
 
@@ -49,7 +101,7 @@ const UserManagement = () => {
 
       <div className="dash-card">
         {loading ? (
-          <p>Loading...</p>
+          <p>Loading users...</p>
         ) : (
           <div style={{ overflowX: "auto" }}>
             <table
@@ -61,14 +113,15 @@ const UserManagement = () => {
                   style={{
                     borderBottom: "1px solid var(--dash-border-color)",
                     textAlign: "left",
+                    background: "#f9f9f9",
                   }}
                 >
-                  <th style={{ padding: "15px" }}>ID</th>
-                  <th style={{ padding: "15px" }}>Name</th>
-                  <th style={{ padding: "15px" }}>Email</th>
-                  <th style={{ padding: "15px" }}>Phone</th>
-                  <th style={{ padding: "15px" }}>Status</th>
-                  <th style={{ padding: "15px" }}>Actions</th>
+                  <th style={{ padding: "12px" }}>ID</th>
+                  <th style={{ padding: "12px" }}>Name</th>
+                  <th style={{ padding: "12px" }}>Email</th>
+                  <th style={{ padding: "12px" }}>Phone</th>
+                  <th style={{ padding: "12px" }}>Status</th>
+                  <th style={{ padding: "12px" }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -79,11 +132,11 @@ const UserManagement = () => {
                       borderBottom: "1px solid var(--dash-border-color)",
                     }}
                   >
-                    <td style={{ padding: "15px" }}>#{user.user_id}</td>
-                    <td style={{ padding: "15px" }}>{user.name}</td>
-                    <td style={{ padding: "15px" }}>{user.email}</td>
-                    <td style={{ padding: "15px" }}>{user.phone_number}</td>
-                    <td style={{ padding: "15px" }}>
+                    <td style={{ padding: "12px" }}>#{user.user_id}</td>
+                    <td style={{ padding: "12px" }}>{user.name}</td>
+                    <td style={{ padding: "12px" }}>{user.email}</td>
+                    <td style={{ padding: "12px" }}>{user.phone_number}</td>
+                    <td style={{ padding: "12px" }}>
                       <button
                         className={`dash-button-sm ${
                           user.is_active
@@ -95,21 +148,27 @@ const UserManagement = () => {
                         {user.is_active ? "Active" : "Banned"}
                       </button>
                     </td>
-                    <td style={{ padding: "15px" }}>
+                    <td style={{ padding: "12px" }}>
                       <button
                         className="dash-button-sm dash-button-danger"
-                        onClick={async () => {
-                          if (confirm("Delete this user permanently?")) {
-                            await adminService.deleteUser(user.user_id);
-                            fetchUsers();
-                          }
-                        }}
+                        onClick={() => handleDelete(user)}
                       >
                         <i className="fas fa-trash"></i>
                       </button>
                     </td>
                   </tr>
                 ))}
+
+                {users.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      style={{ padding: "12px", textAlign: "center" }}
+                    >
+                      No users found.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

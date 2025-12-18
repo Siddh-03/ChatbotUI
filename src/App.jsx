@@ -13,6 +13,7 @@ import UserManagement from "./pages/Admin/UserManagement";
 import BotManagement from "./pages/Admin/BotManagement";
 import PlanManagement from "./pages/Admin/PlanManagement";
 import FeedbackManagement from "./pages/Admin/FeedbackManagement";
+import VerifyEmail from "./pages/VerifyEmail";
 
 // Lazy load heavy pages
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -38,6 +39,7 @@ function App() {
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           {/* Redirect root */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
