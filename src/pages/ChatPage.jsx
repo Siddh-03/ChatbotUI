@@ -1,34 +1,53 @@
 import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import "../styles/Chat.css";
 import { FiSidebar, FiChevronDown } from "react-icons/fi";
 import { useDashboard } from "../hooks/useDashboard";
-
-// Import new sub-components
 import ChatSidebar from "../components/Chat/ChatSidebar";
 import MessageList from "../components/Chat/MessageList";
 import ChatInput from "../components/Chat/ChatInput";
-import { chatService } from '../services/chatService';
+import { chatService } from "../services/chatService";
+
+const AVAILABLE_MODELS = [
+  { id: "fitfusion", name: "FitFusion AI" },
+  { id: "marketing", name: "Marketing Bot" },
+  { id: "mental_health", name: "Mental Health Support" },
+  { id: "general", name: "Standard Assistant" },
+];
 
 const ChatPage = () => {
-  // --- STATE ---
-  const { user } = useDashboard(); // Get user from global hook
+  const { user } = useDashboard();
+  const { botId } = useParams();
+  const navigate = useNavigate();
+
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-  // Chat Data
+  // Initialize Model state from URL param or default to first available
+  const [currentModel, setCurrentModel] = useState(
+    botId && AVAILABLE_MODELS.find((m) => m.id === botId)
+      ? botId
+      : AVAILABLE_MODELS[0].id
+  );
+
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const [files, setFiles] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
   const [currentChatId, setCurrentChatId] = useState(null);
-
-  // UI State
   const [showModelMenu, setShowModelMenu] = useState(false);
-  const [currentModel, setCurrentModel] = useState("Edu YBAI 4.0");
   const [editingMessageId, setEditingMessageId] = useState(null);
 
-  // --- PERSISTENCE ---
+  // --- AUTO-RESET WHEN URL CHANGES ---
+  useEffect(() => {
+    if (botId && botId !== currentModel) {
+      setCurrentModel(botId);
+      startNewChat();
+    }
+  }, [botId]);
+
+  // Persistence
   useEffect(() => {
     const savedHistory = JSON.parse(
       localStorage.getItem("ybai_chat_history") || "[]"
@@ -40,7 +59,6 @@ const ChatPage = () => {
     localStorage.setItem("ybai_chat_history", JSON.stringify(chatHistory));
   }, [chatHistory]);
 
-  // --- HANDLERS ---
   const handleSidebarToggle = () => {
     if (window.innerWidth <= 768) {
       setIsMobileSidebarOpen(!isMobileSidebarOpen);
@@ -49,23 +67,10 @@ const ChatPage = () => {
     }
   };
 
-  const saveCurrentChat = () => {
-    if (messages.length === 0) return;
-    const title = messages[0]?.text?.substring(0, 30) || "New Chat";
-    const newHistoryItem = {
-      id: currentChatId || Date.now(),
-      title,
-      date: new Date().toISOString(),
-      messages,
-    };
-    setChatHistory((prev) => {
-      const filtered = prev.filter((c) => c.id !== newHistoryItem.id);
-      return [newHistoryItem, ...filtered];
-    });
-  };
-
   const startNewChat = () => {
-    if (messages.length > 0) saveCurrentChat();
+    if (messages.length > 0) {
+      // Logic to save previous chat could go here if needed
+    }
     setMessages([]);
     setInputValue("");
     setFiles([]);
@@ -75,7 +80,6 @@ const ChatPage = () => {
   };
 
   const loadChat = (chatId) => {
-    if (messages.length > 0) saveCurrentChat();
     const chat = chatHistory.find((c) => c.id === chatId);
     if (chat) {
       setMessages(chat.messages || []);
@@ -93,52 +97,92 @@ const ChatPage = () => {
 
   const handleDeleteChat = (id) => {
     setChatHistory((prev) => prev.filter((c) => c.id !== id));
-    if (currentChatId === id) {
-      startNewChat();
-    }
+    if (currentChatId === id) startNewChat();
   };
 
   const handleSend = async () => {
-  if ((!inputValue.trim() && files.length === 0) || isTyping) return;
+    if ((!inputValue.trim() && files.length === 0) || isTyping) return;
 
-  // 1. Add User Message immediately (Optimistic UI)
-  const userMsg = {
-    id: Date.now(),
-    text: inputValue,
-    sender: "user",
-    timestamp: new Date(),
-    attachments: files.map(f => f.name)
-  };
-  setMessages(prev => [...prev, userMsg]);
-  setInputValue("");
-  setFiles([]);
-  setIsTyping(true);
-
-  try {
-    // 2. REAL API CALL
-    const data = await chatService.sendMessage(userMsg.text, currentModel, files);
-    
-    // 3. Add AI Response from Backend
-    const aiMsg = {
-      id: Date.now() + 1,
-      text: data.text, // Assuming backend returns { text: "..." }
-      sender: "ai",
-      timestamp: new Date()
+    const userMsg = {
+      id: Date.now(),
+      text: inputValue,
+      sender: "user",
+      timestamp: new Date(),
+      attachments: files.map((f) => f.name),
     };
-    setMessages(prev => [...prev, aiMsg]);
-  } catch (error) {
-    console.error("Chat error:", error);
-    // Add error message to chat
-    setMessages(prev => [...prev, { 
-      id: Date.now(), 
-      text: "Error connecting to AI.", 
-      sender: "ai", 
-      isError: true 
-    }]);
-  } finally {
-    setIsTyping(false);
-  }
-};
+    setMessages((prev) => [...prev, userMsg]);
+    setInputValue("");
+    setFiles([]);
+    setIsTyping(true);
+
+    try {
+      const additionalData = { attachments: files };
+
+      // Inject Health Data (Critical for Mental Health Bot)
+      if (currentModel === "mental_health") {
+        additionalData.health_data = {
+          sleep: "7 hours",
+          stress: "low",
+          exercise: "yes",
+          mood: "neutral",
+        };
+      }
+
+      const data = await chatService.sendMessage(
+        userMsg.text,
+        currentModel,
+        additionalData
+      );
+
+      // --- JSON UNWRAPPER LOGIC ---
+      // This ensures we extract the real message if the API returns a JSON string
+      let aiText = data.text;
+      try {
+        if (aiText && (aiText.startsWith("{") || aiText.startsWith("["))) {
+          const parsed = JSON.parse(aiText);
+
+          // Check for 'results' array (FitFusion/Mental Health)
+          if (parsed.results && Array.isArray(parsed.results)) {
+            aiText = parsed.results.join("\n\n");
+          }
+          // Check for 'response' string (Marketing Bot)
+          else if (parsed.response) {
+            aiText = parsed.response;
+          }
+          // Check for 'result' or 'reply' (Common variations)
+          else if (parsed.result) {
+            aiText = parsed.result;
+          }
+        }
+      } catch (e) {
+        // If parsing fails, it's just normal text, keep it as is.
+      }
+      // -----------------------------
+
+      const aiMsg = {
+        id: Date.now() + 1,
+        text: aiText,
+        sender: "ai",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, aiMsg]);
+    } catch (error) {
+      console.error("Chat error:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          text:
+            error.text ||
+            "Error: Could not connect to the agent. Please try again.",
+          sender: "ai",
+          isError: true,
+        },
+      ]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
 
   const handleSaveEditedMessage = () => {
     const newText = (inputValue || "").trim();
@@ -152,6 +196,14 @@ const ChatPage = () => {
     setInputValue("");
     setFiles([]);
   };
+
+  const onModelDropdownClick = (modelId) => {
+    navigate(`/chat/${modelId}`);
+    setShowModelMenu(false);
+  };
+
+  const currentModelName =
+    AVAILABLE_MODELS.find((m) => m.id === currentModel)?.name || currentModel;
 
   return (
     <div className="chat-layout">
@@ -180,7 +232,6 @@ const ChatPage = () => {
             if (isMobileSidebarOpen) setIsMobileSidebarOpen(false);
           }}
         >
-          {/* Header remains here as it controls specific page state */}
           <header className="chat-header">
             <button
               className="action-btn"
@@ -203,18 +254,23 @@ const ChatPage = () => {
                   setShowModelMenu(!showModelMenu);
                 }}
               >
-                <span>{currentModel}</span>
+                <span>{currentModelName}</span>
                 <FiChevronDown style={{ opacity: 0.5 }} />
               </div>
+
               {showModelMenu && (
                 <div className="popover-menu" style={{ top: "40px", left: 0 }}>
-                  {["Edu YBAI 4.0", "Edu YBAI 3.5"].map((model) => (
+                  {AVAILABLE_MODELS.map((model) => (
                     <div
-                      key={model}
+                      key={model.id}
                       className="popover-item"
-                      onClick={() => setCurrentModel(model)}
+                      onClick={() => onModelDropdownClick(model.id)}
+                      style={{
+                        fontWeight:
+                          currentModel === model.id ? "bold" : "normal",
+                      }}
                     >
-                      {model}
+                      {model.name}
                     </div>
                   ))}
                 </div>
@@ -226,10 +282,7 @@ const ChatPage = () => {
           <MessageList
             messages={messages}
             isTyping={isTyping}
-            onCopy={(text) => {
-              navigator.clipboard.writeText(text);
-              alert("Copied!");
-            }}
+            onCopy={(text) => navigator.clipboard.writeText(text)}
             onEdit={handleSaveEditedMessage}
             onPromptClick={setInputValue}
           />

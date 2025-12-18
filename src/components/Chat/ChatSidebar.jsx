@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // 1. Import Hook
 import {
   FiSidebar,
   FiPlus,
@@ -23,11 +24,12 @@ const ChatSidebar = ({
   onDeleteChat,
   user,
 }) => {
+  const navigate = useNavigate(); // 2. Initialize Hook
   const [searchTerm, setSearchTerm] = useState("");
   const [activeMenuId, setActiveMenuId] = useState(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
-  // Group history logic moved here
+  // Group history logic
   const getGroupedHistory = () => {
     const groups = { Today: [], Yesterday: [], Older: [] };
     const now = new Date();
@@ -42,6 +44,15 @@ const ChatSidebar = ({
         else groups.Older.push(chat);
       });
     return groups;
+  };
+
+  // 3. Handle Logout Logic
+  const handleLogout = () => {
+    if (window.confirm("Are you sure you want to log out?")) {
+      localStorage.removeItem("authToken"); // Clear Token
+      localStorage.removeItem("user"); // Clear User Data
+      navigate("/login"); // Redirect
+    }
   };
 
   return (
@@ -191,10 +202,16 @@ const ChatSidebar = ({
               style={{ bottom: "100%", left: "10px", marginBottom: "10px" }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="popover-item">
+              <div
+                className="popover-item"
+                onClick={() => navigate("/settings")} // 4. Navigate Settings
+              >
                 <FiSettings /> Settings
               </div>
-              <div className="popover-item danger">
+              <div
+                className="popover-item danger"
+                onClick={handleLogout} // 5. Call Logout
+              >
                 <FiLogOut /> Log out
               </div>
             </div>

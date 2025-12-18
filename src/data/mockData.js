@@ -1,68 +1,50 @@
 // src/data/mockData.js
 
+// src/data/mockData.js
+
 export const chatbots = [
   {
-    id: 1,
-    type: "educationai",
-    category: "education learning study academic recommended",
-    title: "Education AI Chatbot",
+    id: "fitfusion",
+    type: "fitfusion",
+    category: "health lifestyle recommended",
+    title: "FitFusion AI",
     description:
-      "Your AI partner for academic research, learning, and complex topics.",
+      "Your personal fitness coach for workout plans, diet tips, and fat loss strategies.",
     image:
-      "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=200&h=200&fit=crop",
+      "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=400&fit=crop", // Gym/Fitness image
     plan: "PRO",
   },
   {
-    id: 2,
-    type: "storytelling",
-    category: "creative storytelling entertainment lifestyle recommended",
-    title: "Story telling chatbot",
+    id: "marketing",
+    type: "marketing",
+    category: "creative productivity business recommended",
+    title: "Marketing Bot",
     description:
-      "Crafts engaging narratives and helps you weave your own tales.",
+      "Expert advice on promoting products, digital marketing strategies, and brand growth.",
     image:
-      "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=200&h=200&fit=crop",
+      "https://images.unsplash.com/photo-1533750516457-a7f992034fec?w=400&h=400&fit=crop", // Marketing/Strategy image
     plan: "FREE",
   },
   {
-    id: 3,
-    type: "sport",
-    category: "sport entertainment lifestyle news recommended",
-    title: "Sport Chatbot",
-    description: "Your go-to source for sports news, scores, and discussions.",
-    image:
-      "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=200&h=200&fit=crop",
-    plan: "",
-  },
-  {
-    id: 4,
-    type: "visualgenerator",
-    category: "creative visual design art productivity recommended",
-    title: "Visual Generator chatbot",
+    id: "mental_health",
+    type: "mental_health",
+    category: "health wellness support recommended",
+    title: "Mental Health Support",
     description:
-      "Creates stunning images and visual content from your prompts.",
+      "A safe space to discuss anxiety, stress, and receive supportive guidance.",
     image:
-      "https://images.unsplash.com/photo-1561089489-f13d5e730d72?w=200&h=200&fit=crop",
+      "https://images.unsplash.com/photo-1527137342181-19aab11a8ee8?w=400&h=400&fit=crop", // Peaceful nature/Health image
     plan: "",
   },
   {
-    id: 5,
-    type: "mentalhealth",
-    category: "health mentalhealth wellness support lifestyle recommended",
-    title: "Mental Health chatbot",
+    id: "general",
+    type: "general",
+    category: "education productivity recommended",
+    title: "Standard Assistant",
     description:
-      "Provides a supportive space for mental well-being and guidance.",
+      "Your versatile AI companion for general queries, writing, and problem-solving.",
     image:
-      "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=200&h=200&fit=crop",
-    plan: "",
-  },
-  {
-    id: 6,
-    type: "summary",
-    category: "productivity utility tools education text recommended",
-    title: "Summary AI chatbot",
-    description: "Condenses long texts and documents into concise summaries.",
-    image:
-      "https://images.unsplash.com/photo-1456324504439-367cee3b3c32?w=200&h=200&fit=crop",
+      "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=400&h=400&fit=crop", // Tech/AI image
     plan: "",
   },
 ];

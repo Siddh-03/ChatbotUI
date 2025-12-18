@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaRobot, FaRegCreditCard } from "react-icons/fa6";
-
+import { FaRobot, FaRegCreditCard, } from "react-icons/fa6";
+import { FaCog } from "react-icons/fa";
 const navItems = [
   { id: "dashboard", label: "Chatbots", icon: FaRobot, path: "/dashboard" },
   {
@@ -10,6 +10,7 @@ const navItems = [
     icon: FaRegCreditCard,
     path: "/subscriptions",
   },
+  { id: "settings", label: "Settings", icon: FaCog, path: "/settings" },
 ];
 
 const MobileBottomNav = () => {
@@ -38,7 +39,9 @@ const MobileBottomNav = () => {
               {item.label}
             </a>
           </li>
+
         ))}
+        
       </ul>
     </nav>
   );

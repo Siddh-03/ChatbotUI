@@ -1,67 +1,85 @@
 import api from "./api";
 
 export const authService = {
-  // ... existing login/signup methods ...
+  // 6. Login (Root Level)
   login: async (email, password) => {
-    const response = await api.post("/auth/login", { email, password });
-    if (response.data.token) {
-      localStorage.setItem("authToken", response.data.token);
-      localStorage.setItem(
-        "agentVerseUser",
-        JSON.stringify(response.data.user)
-      );
+    // URL becomes: /backend/login/ -> http://server.com/login/
+    const response = await api.post("/login/", { email, password });
+
+    if (response.data.status === "success" || response.data.token) {
+      const token = response.data.token || response.data.data?.token;
+      if (token) {
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("agentVerseUser", JSON.stringify({ email }));
+      }
     }
     return response.data;
   },
 
+  // 1. Register User (Root Level)
   signup: async (userData) => {
-    const response = await api.post("/auth/signup", userData);
-    if (response.data.token) {
-      localStorage.setItem("authToken", response.data.token);
-      localStorage.setItem(
-        "agentVerseUser",
-        JSON.stringify(response.data.user)
-      );
-    }
+    // URL becomes: /backend/register/ -> http://server.com/register/
+    const response = await api.post("/register/", userData);
     return response.data;
   },
 
-  logout: () => {
+  // 7. Logout (Root Level)
+  logout: async () => {
+    try {
+      await api.post("/logout/");
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
     localStorage.removeItem("authToken");
     localStorage.removeItem("agentVerseUser");
-    window.location.href = "/login"; // Force redirect
+    window.location.href = "/login";
   },
 
-  // 1. Request OTP
+  // --- PASSWORD RECOVERY (Root Level based on your list) ---
   forgotPassword: async (email) => {
-    return api.post('/auth/forgot-password', { email });
+    return api.post("/forgot-password/", { email });
   },
 
-  // 2. Verify OTP
   verifyOtp: async (email, otp) => {
-    return api.post('/auth/verify-otp', { email, otp });
+    return api.post("/verify-otp/", { email, otp });
   },
 
-  // 3. Reset Password
   resetPassword: async (email, otp, newPassword) => {
-    return api.post('/auth/reset-password', { email, otp, newPassword });
+    return api.post("/reset-password/", {
+      email,
+      otp,
+      new_password: newPassword,
+      confirm_new_password: newPassword,
+    });
   },
 
-  // --- NEW METHODS FOR SETTINGS ---
+  // --- USER PROFILE (Nested under /api/) ---
 
-  // POST /auth/deactivate
-  deactivateAccount: async () => {
-    // We assume the backend handles the logic using the bearer token
-    return api.post("/auth/deactivate");
+  // 8. Get User
+  getUserProfile: async () => {
+    // URL becomes: /backend/api/user/ -> http://server.com/api/user/
+    return api.get("/api/user/");
   },
 
-  // DELETE /auth/delete
-  deleteAccount: async () => {
-    return api.delete("/auth/delete");
+  // 9. Update Profile Photo
+  updateProfilePhoto: async (file) => {
+    const formData = new FormData();
+    formData.append("profile_photo", file);
+    return api.put("/api/user/update-photo/", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
   },
 
-  // GET /auth/export-data
-  exportData: async () => {
-    return api.get("/auth/export-data", { responseType: "blob" }); // Expecting a file
+  // 10. Change Password (Root Level)
+  changePassword: async (email, oldPassword, newPassword) => {
+    return api.post("/change_password/", {
+      email,
+      old_password: oldPassword,
+      new_password: newPassword,
+    });
+  },
+
+  verifyEmailByEmail: async (email, code) => {
+    return api.post("/verifyEmailbyemail/", { email, verification_code: code });
   },
 };

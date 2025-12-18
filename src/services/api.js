@@ -2,7 +2,8 @@ import axios from "axios";
 
 // 1. Create the Axios instance
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000", // Fallback
+  // Point to the new proxy
+  baseURL: "/backend",
   headers: {
     "Content-Type": "application/json",
   },
@@ -11,7 +12,7 @@ const api = axios.create({
 // 2. The "Interceptor" - Automatically attaches your token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("authToken"); // We will save the token here on login
+    const token = localStorage.getItem("authToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -20,14 +21,15 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// 3. Optional: Global Error Handler (e.g., auto-logout on 401)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid
       localStorage.removeItem("authToken");
-      window.location.href = "/login";
+      localStorage.removeItem("agentVerseUser");
+      if (!window.location.pathname.includes("/login")) {
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(error);
   }

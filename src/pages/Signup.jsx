@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Login.css";
 import { Link, useNavigate } from "react-router-dom";
-import { useDashboard } from "../hooks/useDashboard";
+import { authService } from "../services/authService"; // Import directly
 
 const Signup = () => {
-
   useEffect(() => {
     document.title = "Signup | AgentVerse";
   }, []);
 
   const navigate = useNavigate();
-  const { signup } = useDashboard();
+  // We use local state for submitting to control the data format
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -29,7 +29,6 @@ const Signup = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Phone Logic: Only allow numbers, max 10
     if (name === "phone") {
       const numericValue = value.replace(/\D/g, "");
       if (numericValue.length <= 10) {
@@ -40,7 +39,6 @@ const Signup = () => {
 
     setFormData((prev) => {
       const newData = { ...prev, [name]: value };
-      // Auto-fill username from email
       if (name === "email") {
         const userPart = value.split("@")[0];
         newData.username = userPart;
@@ -51,14 +49,13 @@ const Signup = () => {
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
 
     if (!formData.firstName.trim()) newErrors.firstName = "Required";
     if (!formData.lastName.trim()) newErrors.lastName = "Required";
     if (!formData.email.trim()) newErrors.email = "Required";
-    if (!formData.username.trim()) newErrors.username = "Required";
     if (formData.password.length < 6) newErrors.password = "Min 6 chars";
     if (formData.password !== formData.confirmPassword)
       newErrors.confirmPassword = "Mismatch";
@@ -66,8 +63,36 @@ const Signup = () => {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      signup(formData);
-      navigate("/dashboard");
+      setLoading(true);
+      try {
+        // --- PREPARE DATA FOR NEW API ---
+        const apiPayload = {
+          email: formData.email,
+          name: `${formData.firstName} ${formData.lastName}`, // Combine names
+          phone_number: formData.phone, // Rename to phone_number
+          password: formData.password,
+          profession_id: 1, // Default ID (1 = Standard User)
+        };
+
+        const response = await authService.signup(apiPayload);
+
+        if (
+          response.status === "success" ||
+          response.message?.includes("success")
+        ) {
+          // If API requires verification, you might redirect to a verify page here
+          alert("Registration Successful! Please Login.");
+          navigate("/login");
+        } else {
+          // Handle API failure message
+          setErrors({ email: response.message || "Registration failed" });
+        }
+      } catch (error) {
+        console.error("Signup Error:", error);
+        setErrors({ email: error.response?.data?.message || "Server Error" });
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -98,7 +123,7 @@ const Signup = () => {
                   value={formData.firstName}
                   onChange={handleChange}
                   className={errors.firstName ? "input-error" : ""}
-                  style={{ paddingLeft: "15px" }} /* Override icon padding */
+                  style={{ paddingLeft: "15px" }}
                 />
               </div>
             </div>
@@ -131,26 +156,25 @@ const Signup = () => {
                 className={errors.email ? "input-error" : ""}
               />
             </div>
+            {errors.email && <span className="error-text">{errors.email}</span>}
           </div>
 
           <div className="form-group">
-            <label>Username</label>
+            <label>Username (Auto)</label>
             <div className="input-wrapper">
               <i className="fas fa-user input-icon"></i>
               <input
                 type="text"
                 name="username"
-                placeholder="Auto-generated"
                 value={formData.username}
-                onChange={handleChange}
-                className={errors.username ? "input-error" : ""}
-                disabled 
+                disabled
+                style={{ background: "#f5f5f5" }}
               />
             </div>
           </div>
 
           <div className="form-group">
-            <label>Phone (Optional)</label>
+            <label>Phone</label>
             <div className="input-wrapper">
               <i className="fas fa-phone input-icon"></i>
               <input
@@ -211,8 +235,8 @@ const Signup = () => {
             )}
           </div>
 
-          <button type="submit" className="btn-primary">
-            Create Account
+          <button type="submit" className="btn-primary" disabled={loading}>
+            {loading ? "Creating Account..." : "Create Account"}
           </button>
         </form>
 

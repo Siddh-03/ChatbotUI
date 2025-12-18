@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../components/Layout/DashboardLayout";
 import { FaCommentDots, FaArrowUp } from "react-icons/fa6";
-import { dashboardService } from "../services/dashboardService"; // Import Service
-import "../styles/dashboard.css";
+import "../styles/Dashboard.css";
+
+// 1. Import the data directly instead of using 'dashboardService'
+import { chatbots as localChatbotsData } from "../data/mockData";
 
 const tabs = [
   "all",
@@ -17,7 +19,7 @@ const tabs = [
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("all");
-  const [chatbots, setChatbots] = useState([]); // State for bots
+  const [chatbots, setChatbots] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -25,19 +27,11 @@ const Dashboard = () => {
     document.title = "Dashboard | AgentVerse";
   }, []);
 
-  // Fetch Bots on Load
+  // 2. Load data from the local file immediately
   useEffect(() => {
-    const fetchBots = async () => {
-      try {
-        const data = await dashboardService.getChatbots();
-        setChatbots(data);
-      } catch (error) {
-        console.error("Failed to load chatbots:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBots();
+    // We simulate a quick load so the user sees the data instantly without API errors
+    setChatbots(localChatbotsData);
+    setLoading(false);
   }, []);
 
   const filterChatbots = (bot) => {
@@ -46,6 +40,7 @@ const Dashboard = () => {
   };
 
   const handleChatClick = (botType) => {
+    // 3. Ensure we navigate using the URL structure we set up
     navigate(`/chat/${botType}`);
   };
 
@@ -98,7 +93,7 @@ const Dashboard = () => {
                   <div className="dash-actions">
                     <button
                       className="dash-button dash-button-sm"
-                      onClick={() => handleChatClick(bot.type)}
+                      onClick={() => handleChatClick(bot.id)} // Use ID for navigation
                     >
                       <span>
                         <FaCommentDots />

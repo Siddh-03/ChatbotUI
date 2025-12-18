@@ -7,6 +7,12 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import PageLoader from "./components/Layout/PageLoader";
 import NotFound from "./pages/NotFound";
+import AdminLayout from "./components/Layout/AdminLayout";
+import AdminLogin from "./pages/Admin/AdminLogin";
+import UserManagement from "./pages/Admin/UserManagement";
+import BotManagement from "./pages/Admin/BotManagement";
+import PlanManagement from "./pages/Admin/PlanManagement";
+import FeedbackManagement from "./pages/Admin/FeedbackManagement";
 
 // Lazy load heavy pages
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -19,6 +25,16 @@ function App() {
     <div className="App">
       <Suspense fallback={<PageLoader showLoader={true} />}>
         <Routes>
+          {/* --- ADMIN ROUTES --- */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="users" element={<UserManagement />} />
+            <Route path="bots" element={<BotManagement />} />
+            <Route path="plans" element={<PlanManagement />} />
+            <Route path="feedbacks" element={<FeedbackManagement />} />
+            {/* Default redirect to users */}
+            <Route index element={<UserManagement />} />
+          </Route>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
@@ -26,15 +42,6 @@ function App() {
           {/* Redirect root */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           {/* Protected */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          {/* Protected Routes */}
           <Route
             path="/dashboard"
             element={
