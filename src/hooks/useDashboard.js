@@ -10,7 +10,7 @@ export const useDashboard = () => {
     return localStorage.getItem("isAuthenticated") === "true";
   });
 
-  // User State
+  // User State - Defaults to LocalStorage or Static Data
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("agentVerseUser");
     return savedUser
@@ -24,58 +24,34 @@ export const useDashboard = () => {
         };
   });
 
-  // Layout & UI State
+  // UI State
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [sidebarMobileOpen, setSidebarMobileOpen] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showChatbot, setShowChatbot] = useState(false);
-  const [showLoader, setShowLoader] = useState(true);
+  const [showLoader, setShowLoader] = useState(false); // Changed default to false
   const [chatMessages, setChatMessages] = useState([
     { type: "bot", text: "Hello! How can I help?" },
   ]);
   const [chatInput, setChatInput] = useState("");
 
-  // --- Fetch Profile Data ---
+  /* // --- DISABLED PROFILE FETCHING ---
   const fetchUserProfile = useCallback(async () => {
     try {
       const response = await authService.getUserProfile();
-      if (response.data) {
-        const { name, email, user_id } = response.data;
-
-        // Recover phone from signup cache if available (since backend doesn't return it yet)
-        const cachedData = JSON.parse(
-          localStorage.getItem("tempSignupData") || "{}"
-        );
-        const phone =
-          cachedData.email === email ? cachedData.phone : user.phone;
-
-        // Split name into First/Last
-        const nameParts = name ? name.split(" ") : ["User"];
-        const firstName = nameParts[0];
-        const lastName = nameParts.slice(1).join(" ");
-
-        const updatedUser = {
-          ...user,
-          firstName,
-          lastName,
-          name,
-          email,
-          phone: phone || "", // Use cached phone or empty
-          id: user_id,
-        };
-
-        setUser(updatedUser);
-        localStorage.setItem("agentVerseUser", JSON.stringify(updatedUser));
-      }
+      // ... (Rest of the logic commented out)
     } catch (error) {
-      console.error("Failed to fetch profile:", error);
-      if (error.response?.status === 401) {
-        // Token expired
-        authService.logout();
-      }
+       // ...
     }
   }, []);
+  */
 
+  // Dummy function to prevent errors if components call it
+  const fetchUserProfile = useCallback(async () => {
+    console.log("Profile fetching is currently disabled.");
+  }, []);
+
+  /* // --- DISABLED AUTO-FETCH ON MOUNT ---
   useEffect(() => {
     const initDashboard = async () => {
       if (isAuthenticated) {
@@ -85,6 +61,7 @@ export const useDashboard = () => {
     };
     initDashboard();
   }, [isAuthenticated, fetchUserProfile]);
+  */
 
   // Auth Actions
   const login = async (email, password) => {
@@ -95,7 +72,9 @@ export const useDashboard = () => {
       setIsAuthenticated(true);
       localStorage.setItem("isAuthenticated", "true");
 
-      await fetchUserProfile();
+      // We are NOT fetching the profile anymore
+      // await fetchUserProfile();
+
       return true;
     } catch (error) {
       console.error("Login failed:", error);

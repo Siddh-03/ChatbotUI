@@ -9,6 +9,8 @@ import {
   FaSignOutAlt,
   FaAngleLeft,
   FaAngleRight,
+  FaUserTie,
+  FaEnvelopeOpenText, // New Icon
 } from "react-icons/fa";
 import { adminService } from "../../services/adminService";
 
@@ -40,6 +42,15 @@ const AdminSidebar = ({ collapsed, onToggle }) => {
       {/* NAV */}
       <nav className="dash-main-nav">
         <ul>
+          <li className={isActive("/admin/admins")}>
+            <Link to="/admin/admins" title="Admin Management">
+              <span className="dash-nav-icon">
+                <FaUserTie />
+              </span>
+              <span className="dash-nav-text">Admins</span>
+            </Link>
+          </li>
+
           <li className={isActive("/admin/users")}>
             <Link to="/admin/users" title="User Management">
               <span className="dash-nav-icon">
@@ -48,6 +59,17 @@ const AdminSidebar = ({ collapsed, onToggle }) => {
               <span className="dash-nav-text">Users</span>
             </Link>
           </li>
+
+          {/* --- NEW LINK: Email Verifications --- */}
+          <li className={isActive("/admin/email-verifications")}>
+            <Link to="/admin/email-verifications" title="Email Verifications">
+              <span className="dash-nav-icon">
+                <FaEnvelopeOpenText />
+              </span>
+              <span className="dash-nav-text">Email Logs</span>
+            </Link>
+          </li>
+
           <li className={isActive("/admin/bots")}>
             <Link to="/admin/bots" title="Bot Management">
               <span className="dash-nav-icon">

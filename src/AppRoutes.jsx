@@ -2,7 +2,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { lazy } from "react";
 
-// Components needed for structure
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import AdminLayout from "./components/Layout/AdminLayout";
 
@@ -17,10 +16,16 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 // Admin Pages
 const AdminLogin = lazy(() => import("./pages/Admin/AdminLogin"));
 const UserManagement = lazy(() => import("./pages/Admin/UserManagement"));
+const AdminManagement = lazy(() => import("./pages/Admin/AdminManagement"));
+const AdminRegister = lazy(() => import("./pages/Admin/AdminRegister"));
 const BotManagement = lazy(() => import("./pages/Admin/BotManagement"));
 const PlanManagement = lazy(() => import("./pages/Admin/PlanManagement"));
 const FeedbackManagement = lazy(() =>
   import("./pages/Admin/FeedbackManagement")
+);
+// --- NEW IMPORT ---
+const EmailVerificationList = lazy(() =>
+  import("./pages/Admin/EmailVerificationList")
 );
 
 // User Dashboard Pages
@@ -39,6 +44,13 @@ const AppRoutes = () => {
         <Route path="bots" element={<BotManagement />} />
         <Route path="plans" element={<PlanManagement />} />
         <Route path="feedbacks" element={<FeedbackManagement />} />
+
+        <Route path="admins" element={<AdminManagement />} />
+        <Route path="create-admin" element={<AdminRegister />} />
+
+        {/* --- NEW ROUTE --- */}
+        <Route path="email-verifications" element={<EmailVerificationList />} />
+
         <Route index element={<UserManagement />} />
       </Route>
 

@@ -6,6 +6,16 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
+      // --- FIX: MOVED THIS TO THE TOP ---
+      // This must be BEFORE "/api" because "/api-admin" starts with "/api"
+      "/api-admin": {
+        target: "http://multiai-chatbots.ybaisolution.com",
+        changeOrigin: true,
+        secure: false,
+        // Rewrite removes "/api-admin" so the target receives "/api/admin/login"
+        rewrite: (path) => path.replace(/^\/api-admin/, ""),
+      },
+
       // Existing Chatbots Proxy
       "/bot-api": {
         target: "http://multiai-chatbots.ybaisolution.com",
@@ -13,29 +23,21 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/bot-api/, ""),
         secure: false,
       },
+
       // UNIVERSAL PROXY
-      // This catches calls to "/backend" (from your api.js) and forwards them
       "/backend": {
-        // Target is the DOMAIN
         target: "http://multiai-chatbots.ybaisolution.com",
         changeOrigin: true,
         secure: false,
-        // Rewrite "/backend" to "/api/user" to match the new API structure
-        // Request: /backend/register -> Target: .../api/user/register
         rewrite: (path) => path.replace(/^\/backend/, "/api/user"),
       },
-      // General API fallback if needed
+
+      // General API fallback
+      // This must be BELOW "/api-admin"
       "/api": {
         target: "http://multiai-chatbots.ybaisolution.com/api",
         changeOrigin: true,
         secure: false,
-      },
-
-      "/api-admin": {
-        target: "http://multiai-chatbots.ybaisolution.com",
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api-admin/, ""),
       },
     },
   },

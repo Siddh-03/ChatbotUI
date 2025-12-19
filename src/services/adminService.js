@@ -1,27 +1,18 @@
 import axios from "axios";
 
 // Proxy prefix defined in vite.config.js
+// This forwards to http://multiai-chatbots.ybaisolution.com
 const API_URL = "/api-admin";
 
-const ADMIN_TOKEN =
-  "8k5770f877366c727d05791020f01d5c48bb86395c65bfad5cd0645939863627";
-
-// Helper: Get logged-in Admin Data
-const getAdminId = () => {
-  const admin = JSON.parse(localStorage.getItem("adminUser"));
-  return admin?.admin_id;
-};
-
-// 1. Client for Auth Routes
+// 1. Client for Public/Auth Routes (Login)
 const authClient = axios.create({
   baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${ADMIN_TOKEN}`,
   },
 });
 
-// 2. Client for Resource Routes
+// 2. Client for Protected Resources (Requires JWT)
 const resourceClient = axios.create({
   baseURL: API_URL,
   headers: { "Content-Type": "application/json" },
@@ -29,18 +20,48 @@ const resourceClient = axios.create({
 
 // Interceptor to automatically add the JWT Token from LocalStorage
 resourceClient.interceptors.request.use((config) => {
-  const adminData = JSON.parse(localStorage.getItem("adminUser"));
-  const token = adminData?.token;
-  const adminId = adminData?.admin_id;
+  try {
+    console.log(`[Interceptor] Preparing request to: ${config.url}`);
 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    const adminDataString = localStorage.getItem("adminUser");
+    console.log("[Interceptor] Raw LocalStorage 'adminUser':", adminDataString);
+
+    if (adminDataString) {
+      const adminData = JSON.parse(adminDataString);
+      const token = adminData?.token;
+
+      // 1. Attach Token
+      if (token) {
+        console.log("[Interceptor] ✅ Token found. Attaching to headers.");
+        config.headers.Authorization = `Token ${token}`;
+      } else {
+        console.warn(
+          "[Interceptor] ⚠️ 'adminUser' found, but NO 'token' inside it!",
+          adminData
+        );
+      }
+
+      // 2. Inject admin_id (if available and not already in body)
+      const adminId = adminData?.admin_id;
+
+      if (
+        adminId &&
+        config.method !== "get" &&
+        config.data &&
+        typeof config.data === "object"
+      ) {
+        console.log(`[Interceptor] Injecting admin_id: ${adminId}`);
+        config.data = { admin_id: adminId, ...config.data };
+      }
+    } else {
+      console.warn(
+        "[Interceptor] ❌ No 'adminUser' found in LocalStorage. User is not logged in?"
+      );
+    }
+  } catch (error) {
+    console.error("[Interceptor] 💥 Error in admin interceptor:", error);
   }
 
-  // Inject admin_id into body for endpoints that might need it explicitly
-  if (config.method !== "get") {
-    config.data = { ...config.data, admin_id: adminId };
-  }
   return config;
 });
 
@@ -48,11 +69,12 @@ export const adminService = {
   // --- AUTHENTICATION ---
 
   login: async (email, password) => {
-    // FIX: Added trailing slash '/' at the end
-    const response = await authClient.post("/api/admin/login/", {
+    const response = await authClient.post("/api/admin/login", {
       email,
       password,
     });
+
+    console.log("[Login] Response Data:", response.data);
 
     if (response.data.token || response.data.status === "success") {
       localStorage.setItem("adminUser", JSON.stringify(response.data));
@@ -61,10 +83,7 @@ export const adminService = {
   },
 
   registerAdmin: async (adminData) => {
-    // FIX: Added trailing slash
-    return await authClient.post("/api/admin/register/", {
-      ...adminData,
-    });
+    return await resourceClient.post("/api/admin/register", { ...adminData });
   },
 
   logout: () => {
@@ -75,13 +94,11 @@ export const adminService = {
   // --- ADMIN MANAGEMENT ---
 
   getAllAdmins: async () => {
-    // FIX: Added trailing slash
-    return await resourceClient.post("/api/admins/list/");
+    return await resourceClient.post("/api/admins/list", {});
   },
 
   deleteAdmin: async (targetAdminId) => {
-    // FIX: Added trailing slash
-    return await resourceClient.post("/api/admins/delete/", {
+    return await resourceClient.post("/api/admins/delete", {
       admin_id: targetAdminId,
     });
   },
@@ -89,82 +106,83 @@ export const adminService = {
   // --- USER MANAGEMENT ---
 
   getAllUsers: async () => {
-    // FIX: Added trailing slash
-    return await resourceClient.post("/api/admin/get-users/");
+    // Calling with empty object to ensure POST body exists
+    return await resourceClient.post("/api/admin/get-users", {});
   },
 
   updateUser: async (userData) => {
-    // FIX: Added trailing slash
-    return await resourceClient.put("/api/admin/user-update/", userData);
+    return await resourceClient.put("/api/admin/user-update", userData);
   },
 
   deleteUser: async (user_id) => {
-    // FIX: Added trailing slash
-    return await resourceClient.delete("/api/admin/user-delete/", {
+    return await resourceClient.delete("/api/admin/user-delete", {
       data: { user_id },
     });
   },
 
   getUserDocuments: async (user_id) => {
-    // FIX: Added trailing slash
-    return await resourceClient.post("/api/admin/viewUserDocuments/", {
+    return await resourceClient.post("/api/admin/viewUserDocuments", {
       user_id,
     });
+  },
+
+  getEmailVerifications: async () => {
+    return await resourceClient.post("/api/admin/email-verifications", {});
   },
 
   // --- OTHER RESOURCES ---
 
   getAllBots: async () => {
-    return await resourceClient.post("/api/admin/get-bots/");
+    return await resourceClient.post("/api/admin/get-bots", {});
   },
 
   createBot: async (botData) => {
-    return await resourceClient.post("/api/admin/create-bot/", botData);
+    return await resourceClient.post("/api/admin/create-bot", botData);
   },
 
   updateBot: async (botData) => {
-    return await resourceClient.put("/api/admin/bot-update/", botData);
+    return await resourceClient.put("/api/admin/bot-update", botData);
   },
 
   deleteBot: async (bot_id) => {
-    return await resourceClient.delete("/api/admin/bot-delete/", {
+    return await resourceClient.delete("/api/admin/bot-delete", {
       data: { bot_id },
     });
   },
 
   getAllPlans: async () => {
-    return await resourceClient.post("/api/admin/plans/");
+    return await resourceClient.post("/api/admin/plans", {});
   },
 
   createPlan: async (planData) => {
-    return await resourceClient.post("/api/admin/create-plan/", planData);
+    return await resourceClient.post("/api/admin/create-plan", planData);
   },
 
   updatePlan: async (planData) => {
-    return await resourceClient.put("/api/admin/plan-update/", planData);
+    return await resourceClient.put("/api/admin/plan-update", planData);
   },
 
   deletePlan: async (plan_id) => {
-    return await resourceClient.delete("/api/admin/plan-delete/", {
+    return await resourceClient.delete("/api/admin/plan-delete", {
       data: { plan_id },
     });
   },
 
   getAllSubscriptions: async () => {
-    return await resourceClient.post("/api/admin/subscriptions-all/");
+    return await resourceClient.post("/api/admin/subscriptions-all", {});
   },
 
   getAllFeedbacks: async () => {
-    return await resourceClient.get("/api/admin/feedbacks-all/");
+    return await resourceClient.get("/api/admin/feedbacks-all");
   },
 
   deleteFeedback: async (feedback_id) => {
-    return await resourceClient.delete("/api/admin/feedback-delete/", {
+    return await resourceClient.delete("/api/admin/feedback-delete", {
       data: { feedback_id },
     });
   },
 
   getAllPayments: async () => {
-    return await resourceClient.post("/api/admin/payment-list/");
+    return await resourceClient.post("/api/admin/payment-list", {});
   },
 };
