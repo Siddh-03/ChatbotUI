@@ -9,6 +9,8 @@ export const authService = {
 
     if (response.data.token) {
       localStorage.setItem("authToken", response.data.token);
+      // We don't have the user object here, just email.
+      // The hook will fetch the full profile via getUserProfile.
       localStorage.setItem("agentVerseUser", JSON.stringify({ email }));
     }
     return response.data;
@@ -26,14 +28,30 @@ export const authService = {
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
     });
 
+    // Check if registration was successful and if 'user' object is in response
     if (response.data.status === "pending" || response.status === 201) {
-      const tempUser = {
-        name: userData.name,
-        email: userData.email,
-        phone: userData.phone_number,
-        profession_id: userData.profession_id,
-      };
-      localStorage.setItem("tempSignupData", JSON.stringify(tempUser));
+      // The backend returns the full user object in response.data.user
+      const backendUser = response.data.user;
+
+      if (backendUser) {
+        const userToSave = {
+          ...backendUser,
+          firstName: backendUser.name ? backendUser.name.split(" ")[0] : "",
+          lastName: backendUser.name
+            ? backendUser.name.split(" ").slice(1).join(" ")
+            : "",
+        };
+        localStorage.setItem("agentVerseUser", JSON.stringify(userToSave));
+      } else {
+        // Fallback if backend structure changes
+        const tempUser = {
+          name: userData.name,
+          email: userData.email,
+          phone: userData.phone_number,
+          profession_id: userData.profession_id,
+        };
+        localStorage.setItem("tempSignupData", JSON.stringify(tempUser));
+      }
     }
 
     return response.data;
@@ -48,6 +66,7 @@ export const authService = {
     localStorage.removeItem("authToken");
     localStorage.removeItem("agentVerseUser");
     localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("tempSignupData");
     window.location.href = "/login";
   },
 
@@ -76,10 +95,10 @@ export const authService = {
     });
   },
 
-  // --- PROFILE (DISABLED AS REQUESTED) ---
+  // --- PROFILE ---
 
-  /* getUserProfile: async () => {
-    // Backend: @userBp.route("/me")
+  getUserProfile: async () => {
+    // Fetches the current user's data using the token
     return api.get("/me");
   },
 
@@ -99,5 +118,4 @@ export const authService = {
       },
     };
   },
-  */
 };

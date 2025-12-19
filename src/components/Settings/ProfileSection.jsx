@@ -14,17 +14,26 @@ const ProfileSection = () => {
     avatar: "",
   });
 
-  // State for validation errors
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (user) {
-      const nameParts = user.name ? user.name.split(" ") : ["", ""];
+      // If user.firstName exists (from our hook logic), use it.
+      // Otherwise fallback to splitting 'name' manually.
+      let first = user.firstName;
+      let last = user.lastName;
+
+      if (!first && user.name) {
+        const parts = user.name.split(" ");
+        first = parts[0];
+        last = parts.slice(1).join(" ");
+      }
+
       setFormData({
-        firstName: user.firstName || nameParts[0] || "",
-        lastName: user.lastName || nameParts.slice(1).join(" ") || "",
+        firstName: first || "",
+        lastName: last || "",
         email: user.email || "",
-        username: user.username || "",
+        username: user.username || user.email?.split("@")[0] || "",
         phone: user.phone || "",
         avatar: user.avatar || "",
       });
@@ -37,33 +46,30 @@ const ProfileSection = () => {
       tempErrors.firstName = "First name is required";
     if (!formData.lastName.trim())
       tempErrors.lastName = "Last name is required";
-    if (!formData.username.trim()) tempErrors.username = "Username is required";
 
-    // Phone Validation: Must be 10 digits
+    // Username is often read-only or derived, but if editable:
+    // if (!formData.username.trim()) tempErrors.username = "Username is required";
+
     if (formData.phone && formData.phone.length !== 10) {
       tempErrors.phone = "Phone number must be 10 digits";
     }
 
     setErrors(tempErrors);
-    // Return true if no errors
     return Object.keys(tempErrors).length === 0;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Phone: Only allow numbers
     if (name === "phone") {
-      const numericValue = value.replace(/\D/g, ""); // Remove non-digits
+      const numericValue = value.replace(/\D/g, "");
       if (numericValue.length <= 10) {
-        // Max 10 digits
         setFormData({ ...formData, phone: numericValue });
       }
     } else {
       setFormData({ ...formData, [name]: value });
     }
 
-    // Clear error when user types
     if (errors[name]) {
       setErrors({ ...errors, [name]: "" });
     }
@@ -71,8 +77,11 @@ const ProfileSection = () => {
 
   const handleSave = () => {
     if (validate()) {
+      // Updates local context. Note: Backend API to update name isn't available yet,
+      // so this will only reflect in the UI for the current session or until refresh
+      // if not persisted to DB.
       updateProfile(formData);
-      alert("Profile updated successfully!");
+      alert("Profile updated successfully (Local session only)!");
     }
   };
 
@@ -82,7 +91,6 @@ const ProfileSection = () => {
       title="Profile & Account"
       description="Update your personal details from here."
     >
-      {/* First & Last Name Grid */}
       <div
         style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px" }}
       >
@@ -149,9 +157,6 @@ const ProfileSection = () => {
           disabled
           style={{ opacity: 0.7, cursor: "not-allowed" }}
         />
-        {errors.username && (
-          <span className="dash-error-text">{errors.username}</span>
-        )}
       </div>
 
       <div className="dash-form-group">

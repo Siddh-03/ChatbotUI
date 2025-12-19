@@ -10,7 +10,7 @@ export const useDashboard = () => {
     return localStorage.getItem("isAuthenticated") === "true";
   });
 
-  // User State - Defaults to LocalStorage or Static Data
+  // User State
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("agentVerseUser");
     return savedUser
@@ -29,29 +29,44 @@ export const useDashboard = () => {
   const [sidebarMobileOpen, setSidebarMobileOpen] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showChatbot, setShowChatbot] = useState(false);
-  const [showLoader, setShowLoader] = useState(false); // Changed default to false
+  const [showLoader, setShowLoader] = useState(false);
   const [chatMessages, setChatMessages] = useState([
     { type: "bot", text: "Hello! How can I help?" },
   ]);
   const [chatInput, setChatInput] = useState("");
 
-  /* // --- DISABLED PROFILE FETCHING ---
+  // --- FETCH USER PROFILE ---
   const fetchUserProfile = useCallback(async () => {
     try {
       const response = await authService.getUserProfile();
-      // ... (Rest of the logic commented out)
+
+      // The backend returns: { user_id, email, name, is_verified }
+      if (response && response.data) {
+        const backendData = response.data;
+
+        // Split name into First and Last
+        const fullName = backendData.name || "";
+        const nameParts = fullName.split(" ");
+        const firstName = nameParts[0] || "";
+        const lastName = nameParts.slice(1).join(" ") || "";
+
+        const userData = {
+          ...backendData,
+          firstName,
+          lastName,
+          // Ensure these fields exist even if backend sends null
+          phone: backendData.phone || user.phone || "",
+        };
+
+        setUser(userData);
+        localStorage.setItem("agentVerseUser", JSON.stringify(userData));
+      }
     } catch (error) {
-       // ...
+      console.error("Failed to fetch profile:", error);
     }
-  }, []);
-  */
+  }, [user.phone]); // Dependency on phone in case we want to preserve local phone if missing from backend
 
-  // Dummy function to prevent errors if components call it
-  const fetchUserProfile = useCallback(async () => {
-    console.log("Profile fetching is currently disabled.");
-  }, []);
-
-  /* // --- DISABLED AUTO-FETCH ON MOUNT ---
+  // --- AUTO-FETCH ON MOUNT ---
   useEffect(() => {
     const initDashboard = async () => {
       if (isAuthenticated) {
@@ -61,7 +76,6 @@ export const useDashboard = () => {
     };
     initDashboard();
   }, [isAuthenticated, fetchUserProfile]);
-  */
 
   // Auth Actions
   const login = async (email, password) => {
@@ -72,8 +86,8 @@ export const useDashboard = () => {
       setIsAuthenticated(true);
       localStorage.setItem("isAuthenticated", "true");
 
-      // We are NOT fetching the profile anymore
-      // await fetchUserProfile();
+      // Fetch full profile immediately after login to get the name
+      await fetchUserProfile();
 
       return true;
     } catch (error) {
@@ -89,6 +103,21 @@ export const useDashboard = () => {
     setIsAuthenticated(false);
     setUser(null);
     navigate("/login");
+  };
+
+  // Profile Update Helper (Updates Local State)
+  const updateProfile = (newData) => {
+    setUser((prev) => {
+      const updated = { ...prev, ...newData };
+      // Re-construct full name if first/last changed
+      if (newData.firstName || newData.lastName) {
+        updated.name = `${updated.firstName || ""} ${
+          updated.lastName || ""
+        }`.trim();
+      }
+      localStorage.setItem("agentVerseUser", JSON.stringify(updated));
+      return updated;
+    });
   };
 
   // Chat Helpers
@@ -115,6 +144,7 @@ export const useDashboard = () => {
     login,
     logout,
     fetchUserProfile,
+    updateProfile, // Exported so ProfileSection can use it
     sidebarCollapsed,
     setSidebarCollapsed,
     sidebarMobileOpen,

@@ -7,13 +7,16 @@ import {
   FaAngleLeft,
   FaAngleRight,
   FaUserAstronaut,
-} from "react-icons/fa"; // Using FontAwesome icons from react-icons/fa to match your class names
+} from "react-icons/fa";
 
-const Sidebar = ({ collapsed, onToggle, userName, greeting }) => {
+const Sidebar = ({ collapsed, onToggle, user, greeting }) => {
   const location = useLocation();
 
   // Helper to check if a link is active
   const isActive = (path) => (location.pathname === path ? "dash-active" : "");
+
+  // Use First Name if available, otherwise fallback to full name or "User"
+  const displayName = user?.firstName || user?.name || "User";
 
   return (
     <aside className={`dash-sidebar ${collapsed ? "dash-collapsed" : ""}`}>
@@ -31,10 +34,12 @@ const Sidebar = ({ collapsed, onToggle, userName, greeting }) => {
 
       <div className="dash-user-profile">
         <div className="dash-user-avatar">
+          {/* If user has a photo URL, you could use it here, otherwise default icon */}
           <FaUserAstronaut />
         </div>
+        {/* Updated Greeting Logic */}
         <span className="dash-user-greeting">{greeting},</span>
-        <div className="dash-user-name">{userName}</div>
+        <div className="dash-user-name">{displayName}</div>
       </div>
 
       <nav className="dash-main-nav">

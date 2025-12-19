@@ -23,7 +23,7 @@ const DashboardLayout = ({ children }) => {
     showLoader,
     handleChatSubmit,
     getGreeting,
-    user,
+    user, // Get the full user object
   } = useDashboard();
 
   // Smart toggle: close on mobile, collapse on desktop
@@ -46,9 +46,8 @@ const DashboardLayout = ({ children }) => {
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={handleSidebarToggle}
-        userName={user?.name}
+        user={user} // Pass the full user object to Sidebar
         greeting={getGreeting()}
-        // activePage prop removed; Sidebar handles this internally via useLocation
       />
 
       <div
@@ -71,7 +70,6 @@ const DashboardLayout = ({ children }) => {
         <main className="dash-main-content-area">{children}</main>
       </div>
 
-      {/* activePage prop removed; MobileBottomNav now handles this internally */}
       <MobileBottomNav />
 
       <ChatbotWidget

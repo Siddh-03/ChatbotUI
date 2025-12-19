@@ -23,6 +23,9 @@ const ChatPage = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
+  // FIX: Add state to track mobile screen size dynamically
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
   // Initialize Model state from URL param or default to first available
   const [currentModel, setCurrentModel] = useState(
     botId && AVAILABLE_MODELS.find((m) => m.id === botId)
@@ -38,6 +41,22 @@ const ChatPage = () => {
   const [currentChatId, setCurrentChatId] = useState(null);
   const [showModelMenu, setShowModelMenu] = useState(false);
   const [editingMessageId, setEditingMessageId] = useState(null);
+
+  // FIX: Add useEffect to handle real-time window resizing
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+
+      // Auto-close mobile sidebar if switching to desktop view
+      if (!mobile) {
+        setIsMobileSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // --- AUTO-RESET WHEN URL CHANGES ---
   useEffect(() => {
@@ -60,7 +79,7 @@ const ChatPage = () => {
   }, [chatHistory]);
 
   const handleSidebarToggle = () => {
-    if (window.innerWidth <= 768) {
+    if (isMobile) {
       setIsMobileSidebarOpen(!isMobileSidebarOpen);
     } else {
       setIsSidebarCollapsed(!isSidebarCollapsed);
@@ -76,7 +95,7 @@ const ChatPage = () => {
     setFiles([]);
     setEditingMessageId(null);
     setCurrentChatId(Date.now());
-    if (window.innerWidth <= 768) setIsMobileSidebarOpen(false);
+    if (isMobile) setIsMobileSidebarOpen(false);
   };
 
   const loadChat = (chatId) => {
@@ -86,7 +105,7 @@ const ChatPage = () => {
       setCurrentChatId(chat.id);
       setEditingMessageId(null);
     }
-    if (window.innerWidth <= 768) setIsMobileSidebarOpen(false);
+    if (isMobile) setIsMobileSidebarOpen(false);
   };
 
   const handleRenameChat = (id, newTitle) => {
@@ -118,7 +137,6 @@ const ChatPage = () => {
     try {
       const additionalData = { attachments: files };
 
-      // Inject Health Data (Critical for Mental Health Bot)
       if (currentModel === "mental_health") {
         additionalData.health_data = {
           sleep: "7 hours",
@@ -134,30 +152,21 @@ const ChatPage = () => {
         additionalData
       );
 
-      // --- JSON UNWRAPPER LOGIC ---
-      // This ensures we extract the real message if the API returns a JSON string
       let aiText = data.text;
       try {
         if (aiText && (aiText.startsWith("{") || aiText.startsWith("["))) {
           const parsed = JSON.parse(aiText);
-
-          // Check for 'results' array (FitFusion/Mental Health)
           if (parsed.results && Array.isArray(parsed.results)) {
             aiText = parsed.results.join("\n\n");
-          }
-          // Check for 'response' string (Marketing Bot)
-          else if (parsed.response) {
+          } else if (parsed.response) {
             aiText = parsed.response;
-          }
-          // Check for 'result' or 'reply' (Common variations)
-          else if (parsed.result) {
+          } else if (parsed.result) {
             aiText = parsed.result;
           }
         }
       } catch (e) {
-        // If parsing fails, it's just normal text, keep it as is.
+        // parsing failed, treat as text
       }
-      // -----------------------------
 
       const aiMsg = {
         id: Date.now() + 1,
@@ -233,11 +242,12 @@ const ChatPage = () => {
           }}
         >
           <header className="chat-header">
+            {/* FIX: Use isMobile state for consistent rendering */}
             <button
               className="action-btn"
               style={{
                 marginRight: 10,
-                display: window.innerWidth <= 768 ? "block" : "none",
+                display: isMobile ? "block" : "none",
               }}
               onClick={(e) => {
                 e.stopPropagation();

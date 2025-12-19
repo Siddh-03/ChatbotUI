@@ -564,8 +564,71 @@
    FIX: MOBILE OVERLAY & RESPONSIVENESS
    ========================================= */
 
+@media (min-width: 600px) and (max-width: 992px) {
+  .chat-layout .prompt-grid {
+    display: grid;
+    /* Force 2 columns side-by-side */
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 15px;
+    padding: 0 20px; /* Add breathing room so it doesn't touch edges */
+  }
+
+  /* Fix the Sidebar overlay logic for tablets if needed */
+  .chat-layout .chat-main {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+}
+
+@media (max-width: 599px) {
+  .chat-layout .prompt-grid {
+    display: grid;
+    /* Force 1 column (stacked) */
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+    padding: 0 15px;
+  }
+
+  .chat-layout .chat-main {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+  
+  /* Prevent horizontal scrolling "red rounded part" issue */
+  .chat-layout .chat-container,
+  .chat-layout .chat-area {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+}
+
 @media (max-width: 768px) {
-  /* Ensure Sidebar is ABOVE the overlay */
+  .chat-layout .chat-main {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  .chat-layout .prompt-grid {
+    /* Force 1 column to prevent "going inside right side" */
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 5px; /* Tiny buffer to prevent edge touching */
+  }
+
+  .chat-layout .prompt-card {
+    min-width: 0; /* Allow card to shrink if needed */
+    width: 100%;
+  }
+
+  /* Ensure the messages list doesn't push width out */
+  .chat-layout .messages-list {
+    padding: 15px 10px; /* Reduced side padding for mobile */
+    width: 100%;
+    overflow-x: hidden; /* Cut off any rogue overflow */
+  }
+  /* Sidebar Overlay */
   .chat-layout .sidebar {
     position: fixed;
     left: 0;
