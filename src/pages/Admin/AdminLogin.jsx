@@ -1,24 +1,35 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import { adminService } from "../../services/adminService"; // Keep for later
+import { adminService } from "../../services/adminService";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    // Real login blocked for now? Use bypass.
-    setError("API unavailable. Please use Guest Login.");
-  };
+    setLoading(true);
+    setError("");
 
-  const handleBypass = () => {
-    // 1. Set the token that AdminLayout looks for
-    localStorage.setItem("adminUser", JSON.stringify({ name: "Dev Admin" }));
-    // 2. Redirect
-    navigate("/admin/users");
+    try {
+      const response = await adminService.login(email, password);
+      // Assuming response structure matches: { token: "..." }
+      if (response.token || response.status === "success") {
+        navigate("/admin/users");
+      } else {
+        setError("Login failed. Please check credentials.");
+      }
+    } catch (err) {
+      console.error("Admin Login Error:", err);
+      setError(
+        err.response?.data?.error || "Invalid credentials or server error."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -37,6 +48,7 @@ const AdminLogin = () => {
               style={inputStyle}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
           <div style={{ marginBottom: "20px", textAlign: "left" }}>
@@ -46,31 +58,20 @@ const AdminLogin = () => {
               style={inputStyle}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
           {error && <p style={{ color: "red", fontSize: "0.9rem" }}>{error}</p>}
-          <button type="submit" style={btnStyle}>
-            Sign In
+          <button type="submit" style={btnStyle} disabled={loading}>
+            {loading ? "Verifying..." : "Sign In"}
           </button>
         </form>
-
-        <div
-          style={{
-            marginTop: "20px",
-            borderTop: "1px solid #eee",
-            paddingTop: "15px",
-          }}
-        >
-          <button onClick={handleBypass} style={bypassBtnStyle}>
-            Login as Guest (Bypass)
-          </button>
-        </div>
       </div>
     </div>
   );
 };
 
-// Internal Styles for speed
+// Internal Styles
 const pageStyle = {
   minHeight: "100vh",
   display: "flex",
@@ -106,15 +107,6 @@ const btnStyle = {
   cursor: "pointer",
   fontSize: "1rem",
   fontWeight: "600",
-};
-const bypassBtnStyle = {
-  background: "transparent",
-  border: "1px dashed #999",
-  color: "#666",
-  padding: "8px 16px",
-  borderRadius: "6px",
-  cursor: "pointer",
-  fontSize: "0.85rem",
 };
 
 export default AdminLogin;

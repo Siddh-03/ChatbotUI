@@ -1,17 +1,18 @@
 import axios from "axios";
 
-// API Configuration
-const API_URL = "http://localhost:5000"; // Adjust if your Flask runs elsewhere
+// Proxy prefix defined in vite.config.js
+const API_URL = "/api-admin";
+
 const ADMIN_TOKEN =
   "8k5770f877366c727d05791020f01d5c48bb86395c65bfad5cd0645939863627";
 
-// Helper: Get logged-in Admin ID
+// Helper: Get logged-in Admin Data
 const getAdminId = () => {
   const admin = JSON.parse(localStorage.getItem("adminUser"));
   return admin?.admin_id;
 };
 
-// 1. Client for Auth Routes (Requires Static Token Header)
+// 1. Client for Auth Routes
 const authClient = axios.create({
   baseURL: API_URL,
   headers: {
@@ -20,38 +21,49 @@ const authClient = axios.create({
   },
 });
 
-// 2. Client for Resource Routes (Requires admin_id in body)
+// 2. Client for Resource Routes
 const resourceClient = axios.create({
   baseURL: API_URL,
   headers: { "Content-Type": "application/json" },
 });
 
-// Interceptor to inject admin_id into every resource request
+// Interceptor to automatically add the JWT Token from LocalStorage
 resourceClient.interceptors.request.use((config) => {
-  const adminId = getAdminId();
+  const adminData = JSON.parse(localStorage.getItem("adminUser"));
+  const token = adminData?.token;
+  const adminId = adminData?.admin_id;
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  // Inject admin_id into body for endpoints that might need it explicitly
   if (config.method !== "get") {
     config.data = { ...config.data, admin_id: adminId };
-  } else {
-    // For GET requests that require body (rare but present in your python)
-    config.data = { admin_id: adminId };
   }
   return config;
 });
 
 export const adminService = {
   // --- AUTHENTICATION ---
+
   login: async (email, password) => {
-    const response = await authClient.post("/admin/login", { email, password });
-    if (response.data.status === "success") {
-      localStorage.setItem("adminUser", JSON.stringify(response.data.data));
+    // FIX: Added trailing slash '/' at the end
+    const response = await authClient.post("/api/admin/login/", {
+      email,
+      password,
+    });
+
+    if (response.data.token || response.data.status === "success") {
+      localStorage.setItem("adminUser", JSON.stringify(response.data));
     }
     return response.data;
   },
 
   registerAdmin: async (adminData) => {
-    return await authClient.post("/admin/register", {
+    // FIX: Added trailing slash
+    return await authClient.post("/api/admin/register/", {
       ...adminData,
-      admin_id: getAdminId(), // Superadmin ID needed to register others
     });
   },
 
@@ -60,75 +72,99 @@ export const adminService = {
     window.location.href = "/admin/login";
   },
 
+  // --- ADMIN MANAGEMENT ---
+
+  getAllAdmins: async () => {
+    // FIX: Added trailing slash
+    return await resourceClient.post("/api/admins/list/");
+  },
+
+  deleteAdmin: async (targetAdminId) => {
+    // FIX: Added trailing slash
+    return await resourceClient.post("/api/admins/delete/", {
+      admin_id: targetAdminId,
+    });
+  },
+
   // --- USER MANAGEMENT ---
+
   getAllUsers: async () => {
-    return await resourceClient.post("/admin/get-users");
+    // FIX: Added trailing slash
+    return await resourceClient.post("/api/admin/get-users/");
   },
+
   updateUser: async (userData) => {
-    return await resourceClient.put("/admin/user-update", userData);
+    // FIX: Added trailing slash
+    return await resourceClient.put("/api/admin/user-update/", userData);
   },
+
   deleteUser: async (user_id) => {
-    return await resourceClient.delete("/admin/user-delete", {
-      data: { admin_id: getAdminId(), user_id },
+    // FIX: Added trailing slash
+    return await resourceClient.delete("/api/admin/user-delete/", {
+      data: { user_id },
     });
   },
+
   getUserDocuments: async (user_id) => {
-    return await resourceClient.post("/admin/viewUserDocuments", { user_id });
+    // FIX: Added trailing slash
+    return await resourceClient.post("/api/admin/viewUserDocuments/", {
+      user_id,
+    });
   },
 
-  // --- BOT MANAGEMENT ---
+  // --- OTHER RESOURCES ---
+
   getAllBots: async () => {
-    return await resourceClient.post("/admin/get-bots");
+    return await resourceClient.post("/api/admin/get-bots/");
   },
+
   createBot: async (botData) => {
-    return await resourceClient.post("/admin/create-bot", botData);
+    return await resourceClient.post("/api/admin/create-bot/", botData);
   },
+
   updateBot: async (botData) => {
-    return await resourceClient.put("/admin/bot-update", botData);
+    return await resourceClient.put("/api/admin/bot-update/", botData);
   },
+
   deleteBot: async (bot_id) => {
-    return await resourceClient.delete("/admin/bot-delete", {
-      data: { admin_id: getAdminId(), bot_id },
+    return await resourceClient.delete("/api/admin/bot-delete/", {
+      data: { bot_id },
     });
   },
 
-  // --- PLAN MANAGEMENT ---
   getAllPlans: async () => {
-    return await resourceClient.post("/admin/plans");
+    return await resourceClient.post("/api/admin/plans/");
   },
+
   createPlan: async (planData) => {
-    return await resourceClient.post("/admin/create-plan", planData);
+    return await resourceClient.post("/api/admin/create-plan/", planData);
   },
+
   updatePlan: async (planData) => {
-    return await resourceClient.put("/admin/plan-update", planData);
+    return await resourceClient.put("/api/admin/plan-update/", planData);
   },
+
   deletePlan: async (plan_id) => {
-    return await resourceClient.delete("/admin/plan-delete", {
-      data: { admin_id: getAdminId(), plan_id },
+    return await resourceClient.delete("/api/admin/plan-delete/", {
+      data: { plan_id },
     });
   },
 
-  // --- SUBSCRIPTIONS ---
   getAllSubscriptions: async () => {
-    return await resourceClient.post("/admin/subscriptions-all");
+    return await resourceClient.post("/api/admin/subscriptions-all/");
   },
 
-  // --- FEEDBACKS ---
   getAllFeedbacks: async () => {
-    // Note: Python backend defines this as GET but expects body data.
-    // Axios supports body in GET via 'data' config, but some proxies strip it.
-    return await resourceClient.get("/admin/feedbacks-all", {
-      data: { admin_id: getAdminId() },
-    });
+    return await resourceClient.get("/api/admin/feedbacks-all/");
   },
+
   deleteFeedback: async (feedback_id) => {
-    return await resourceClient.delete("/admin/feedback-delete", {
-      data: { admin_id: getAdminId(), feedback_id },
+    return await resourceClient.delete("/api/admin/feedback-delete/", {
+      data: { feedback_id },
     });
   },
 
-  // --- PAYMENT DETAILS ---
   getAllPayments: async () => {
-    return await resourceClient.post("/admin/payment-list");
+    return await resourceClient.post("/api/admin/payment-list/");
   },
 };

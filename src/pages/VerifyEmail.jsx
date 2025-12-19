@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "../styles/Login.css"; // Reuse your existing styles!
+import "../styles/Login.css";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { authService } from "../services/authService";
 
@@ -7,9 +7,7 @@ const VerifyEmail = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Get email passed from the Signup page
   const [email, setEmail] = useState(location.state?.email || "");
-
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -19,14 +17,6 @@ const VerifyEmail = () => {
 
   const otpRefs = useRef([]);
 
-  // Redirect if no email is found (user tried to access page directly)
-  useEffect(() => {
-    if (!email) {
-      navigate("/signup");
-    }
-  }, [email, navigate]);
-
-  // Timer Logic
   useEffect(() => {
     let interval;
     if (timer > 0 && !success) {
@@ -37,20 +27,17 @@ const VerifyEmail = () => {
     return () => clearInterval(interval);
   }, [timer, success]);
 
-  // Handle Input Change
   const handleOtpChange = (index, value) => {
     if (isNaN(value)) return;
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
 
-    // Auto-focus next input
     if (value && index < 5) {
       otpRefs.current[index + 1].focus();
     }
   };
 
-  // Handle Backspace
   const handleKeyDown = (index, e) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
       otpRefs.current[index - 1].focus();
@@ -59,6 +46,15 @@ const VerifyEmail = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Clean email: Remove whitespace AND invisible characters
+    const cleanEmail = email.trim().replace(/[\u200B-\u200D\uFEFF]/g, "");
+
+    if (!cleanEmail) {
+      setError("Please enter your email address.");
+      return;
+    }
+
     const code = otp.join("");
     if (code.length < 6) {
       setError("Please enter the full 6-digit code.");
@@ -69,36 +65,31 @@ const VerifyEmail = () => {
     setError("");
 
     try {
-      // Use the specific endpoint for Email Verification
-      await authService.verifyEmailByEmail(email, code);
+      const response = await authService.verifyEmailByEmail(cleanEmail, code);
+      console.log("Verify Success Response:", response);
 
       setSuccess(true);
       setTimeout(() => {
         navigate("/login");
-      }, 3000); // Redirect to login after 3 seconds
+      }, 3000);
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Verification failed. Invalid Code."
-      );
+      console.error("Verification Error:", err);
+
+      const msg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "Verification failed. Invalid or Expired Code.";
+
+      setError(msg);
     } finally {
       setLoading(false);
     }
   };
 
   const handleResend = async () => {
-    setLoading(true);
-    try {
-      // Usually, hitting the signup endpoint again triggers a resend,
-      // or you might need a specific 'resend-verification' endpoint.
-      // For now, we'll alert the user.
-      alert("Resend code feature coming soon via backend!");
-      setTimer(60);
-      setIsExpired(false);
-    } catch (err) {
-      setError("Could not resend code.");
-    } finally {
-      setLoading(false);
-    }
+    alert("Resend code feature coming soon via backend!");
+    setTimer(60);
+    setIsExpired(false);
   };
 
   return (
@@ -123,9 +114,31 @@ const VerifyEmail = () => {
         ) : (
           <>
             <h1>Verify Account</h1>
-            <p className="subtitle">
-              We sent a code to <b>{email}</b>
-            </p>
+
+            {location.state?.email ? (
+              <p className="subtitle">
+                We sent a code to <b>{email}</b>
+              </p>
+            ) : (
+              <div style={{ marginBottom: "20px" }}>
+                <p className="subtitle">
+                  Enter your email and the code sent to you.
+                </p>
+                <div className="form-group" style={{ textAlign: "left" }}>
+                  <label>Email Address</label>
+                  <div className="input-wrapper">
+                    <i className="fas fa-envelope input-icon"></i>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="name@example.com"
+                      style={{ width: "100%" }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit}>
               <div className="otp-container">

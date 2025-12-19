@@ -13,22 +13,29 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/bot-api/, ""),
         secure: false,
       },
-      // FIXED UNIVERSAL PROXY
+      // UNIVERSAL PROXY
       // This catches calls to "/backend" (from your api.js) and forwards them
       "/backend": {
-        // Target is the DOMAIN, not the full path
+        // Target is the DOMAIN
         target: "http://multiai-chatbots.ybaisolution.com",
         changeOrigin: true,
         secure: false,
-        // Rewrite "/backend" to "/api/auth" to match the API structure
-        // Request: /backend/register -> Target: .../api/auth/register
-        rewrite: (path) => path.replace(/^\/backend/, "/api/auth"),
+        // Rewrite "/backend" to "/api/user" to match the new API structure
+        // Request: /backend/register -> Target: .../api/user/register
+        rewrite: (path) => path.replace(/^\/backend/, "/api/user"),
       },
-      // General API fallback if needed (optional)
+      // General API fallback if needed
       "/api": {
         target: "http://multiai-chatbots.ybaisolution.com/api",
         changeOrigin: true,
         secure: false,
+      },
+
+      "/api-admin": {
+        target: "http://multiai-chatbots.ybaisolution.com",
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api-admin/, ""),
       },
     },
   },

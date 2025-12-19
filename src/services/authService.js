@@ -1,85 +1,133 @@
 import api from "./api";
 
 export const authService = {
-  // 6. Login (Root Level)
+  // --- AUTHENTICATION ---
+
+  // 1. Login
   login: async (email, password) => {
-    // URL becomes: /backend/login/ -> http://server.com/login/
-    const response = await api.post("/login/", { email, password });
+    const payload = { email, password };
+    // Backend: @userBp.route("/login")
+    const response = await api.post("/login", payload);
 
-    if (response.data.status === "success" || response.data.token) {
-      const token = response.data.token || response.data.data?.token;
-      if (token) {
-        localStorage.setItem("authToken", token);
-        localStorage.setItem("agentVerseUser", JSON.stringify({ email }));
-      }
+    if (response.data.token) {
+      localStorage.setItem("authToken", response.data.token);
+      // Store basic email to help with state recovery
+      localStorage.setItem("agentVerseUser", JSON.stringify({ email }));
     }
     return response.data;
   },
 
-  // 1. Register User (Root Level)
+  // 2. Register User
   signup: async (userData) => {
-    // URL becomes: /backend/register/ -> http://server.com/register/
-    const response = await api.post("/register", userData);
+    const params = new URLSearchParams();
+    params.append("email", userData.email);
+    params.append("name", userData.name);
+    params.append("phone_number", userData.phone_number);
+    params.append("password", userData.password);
+    params.append("profession_id", userData.profession_id);
+
+    // Backend: @userBp.route("/register")
+    const response = await api.post("/register", params, {
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    });
+
+    // CACHE FIX: Store phone/profession locally since /me endpoint doesn't return them yet
+    if (response.data.status === "pending" || response.status === 201) {
+      const tempUser = {
+        name: userData.name,
+        email: userData.email,
+        phone: userData.phone_number,
+        profession_id: userData.profession_id,
+      };
+      localStorage.setItem("tempSignupData", JSON.stringify(tempUser));
+    }
+
     return response.data;
   },
 
-  // 7. Logout (Root Level)
+  // 3. Verify Email
+  verifyEmailByEmail: async (email, code) => {
+    const payload = {
+      email: email,
+      code: String(code), // Backend expects 'code'
+    };
+
+    // Backend: @userBp.route("/verifyEmail")
+    return api.post("/verifyEmail", payload, {
+      transformRequest: [
+        (data, headers) => {
+          delete headers.Authorization;
+          return JSON.stringify(data);
+        },
+      ],
+      headers: { "Content-Type": "application/json" },
+    });
+  },
+
+  // 4. Logout
   logout: async () => {
-    try {
-      await api.post("/logout/");
-    } catch (error) {
-      console.error("Logout failed", error);
-    }
     localStorage.removeItem("authToken");
     localStorage.removeItem("agentVerseUser");
+    localStorage.removeItem("isAuthenticated");
     window.location.href = "/login";
   },
 
-  // --- PASSWORD RECOVERY (Root Level based on your list) ---
+  // --- PASSWORD ---
+
   forgotPassword: async (email) => {
-    return api.post("/forgot-password/", { email });
+    // Backend: @userBp.route("/forgot-password")
+    return api.post("/forgot-password", { email });
   },
 
   verifyOtp: async (email, otp) => {
-    return api.post("/verify-otp/", { email, otp });
+    // Backend: @userBp.route("/verify-otp")
+    return api.post("/verify-otp", { email, otp });
   },
 
   resetPassword: async (email, otp, newPassword) => {
-    return api.post("/reset-password/", {
+    // Backend: @userBp.route("/reset-password")
+    return api.post("/reset-password", {
       email,
       otp,
       new_password: newPassword,
-      confirm_new_password: newPassword,
     });
   },
 
-  // --- USER PROFILE (Nested under /api/) ---
-
-  // 8. Get User
-  getUserProfile: async () => {
-    // URL becomes: /backend/api/user/ -> http://server.com/api/user/
-    return api.get("/api/user/");
-  },
-
-  // 9. Update Profile Photo
-  updateProfilePhoto: async (file) => {
-    const formData = new FormData();
-    formData.append("profile_photo", file);
-    return api.put("/api/user/update-photo/", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-  },
-
-  // 10. Change Password (Root Level)
   changePassword: async (email, oldPassword, newPassword) => {
-    return api.post("/change_password/", {
-      email,
+    // Backend: @userBp.route("/change-password")
+    // Note: Backend uses JWT user_id, so 'email' arg is unused but kept for interface consistency
+    return api.post("/change-password", {
       old_password: oldPassword,
       new_password: newPassword,
     });
   },
 
-  verifyEmailByEmail: async (email, code) => {
-    return api.post("/verifyEmailbyemail/", { email, verification_code: code });
+  // --- PROFILE ---
+
+  getUserProfile: async () => {
+    // Backend: @userBp.route("/me")
+    // Returns: { user_id, email, name, is_verified }
+    return api.get("/me");
+  },
+
+  updateProfilePhoto: async (file) => {
+    // Backend: @userBp.route("/me/profile-photo")
+    const formData = new FormData();
+    formData.append("profile_photo", file);
+    return api.put("/me/profile-photo", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+
+  // --- DELETION ---
+  deleteAccount: async () => {
+    // BACKEND LIMITATION: No delete endpoint provided in current backend code.
+    // Throwing error to be handled by UI.
+    throw {
+      response: {
+        status: 501,
+        data: { error: "Feature temporarily unavailable" },
+      },
+    };
   },
 };

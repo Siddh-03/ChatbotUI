@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Login.css";
 import { Link, useNavigate } from "react-router-dom";
-import { authService } from "../services/authService"; // Import directly
+import { authService } from "../services/authService";
 
 const Signup = () => {
   useEffect(() => {
@@ -9,7 +9,6 @@ const Signup = () => {
   }, []);
 
   const navigate = useNavigate();
-  // We use local state for submitting to control the data format
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -49,6 +48,14 @@ const Signup = () => {
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
+  // --- PASSWORD VALIDATION HELPER ---
+  const validatePassword = (pwd) => {
+    // Regex: At least 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
+    // Special chars allowed: @$!%*?& and others commonly used
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    return regex.test(pwd);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
@@ -56,38 +63,73 @@ const Signup = () => {
     if (!formData.firstName.trim()) newErrors.firstName = "Required";
     if (!formData.lastName.trim()) newErrors.lastName = "Required";
     if (!formData.email.trim()) newErrors.email = "Required";
-    if (formData.password.length < 6) newErrors.password = "Min 6 chars";
-    if (formData.password !== formData.confirmPassword)
+
+    // Phone Validation
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Required";
+    } else if (formData.phone.length !== 10) {
+      newErrors.phone = "Must be 10 digits";
+    }
+
+    // Password Validation
+    if (!formData.password) {
+      newErrors.password = "Required";
+    } else if (!validatePassword(formData.password)) {
+      newErrors.password =
+        "Password must be 8+ chars, with 1 Upper, 1 Lower, 1 Number, & 1 Special Char";
+    }
+
+    if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Mismatch";
+    }
 
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
       setLoading(true);
       try {
-        // --- PREPARE DATA FOR NEW API ---
         const apiPayload = {
           email: formData.email,
-          name: `${formData.firstName} ${formData.lastName}`, // Combine names
-          phone_number: formData.phone, // Rename to phone_number
+          name: `${formData.firstName} ${formData.lastName}`,
+          phone_number: formData.phone,
           password: formData.password,
-          profession_id: 1, // Default ID (1 = Standard User)
+          profession_id: 1,
         };
 
         const response = await authService.signup(apiPayload);
 
-        if (
-          response.status === "success" ||
-          response.message?.includes("success")
-        ) {
-          navigate("/verify-email", { state: { email: formData.email } });
+        // --- DEBUG: Log the success response to see what the server sent ---
+        console.log("Signup API Success Response:", response);
+
+        // --- FIXED REDIRECT LOGIC ---
+        // If the code reaches here, axios did NOT throw an error (Status 200-299).
+        // Unless the server explicitly sent "status: 'failure'" inside the JSON, we assume success.
+        if (response?.status === "failure" || response?.error) {
+          setErrors({
+            email: response.message || response.error || "Registration failed",
+          });
         } else {
-          // Handle API failure message
-          setErrors({ email: response.message || "Registration failed" });
+          // Default to success for any 2xx response
+          navigate("/verify-email", { state: { email: formData.email } });
         }
       } catch (error) {
-        console.error("Signup Error:", error);
-        setErrors({ email: error.response?.data?.message || "Server Error" });
+        console.error("Signup Catch Error:", error);
+
+        // Handle 409 Conflict specifically (User already exists)
+        if (error.response?.status === 409) {
+          setErrors({
+            email: "Email or Phone already registered. Please login.",
+          });
+        } else {
+          const serverMessage =
+            error.response?.data?.message ||
+            error.response?.data?.error ||
+            (typeof error.response?.data === "string"
+              ? error.response.data
+              : "Registration failed. Please try again.");
+
+          setErrors({ email: serverMessage });
+        }
       } finally {
         setLoading(false);
       }
@@ -181,8 +223,10 @@ const Signup = () => {
                 placeholder="1234567890"
                 value={formData.phone}
                 onChange={handleChange}
+                className={errors.phone ? "input-error" : ""}
               />
             </div>
+            {errors.phone && <span className="error-text">{errors.phone}</span>}
           </div>
 
           <div className="form-group">
@@ -242,6 +286,13 @@ const Signup = () => {
           Already have an account?{" "}
           <Link to="/login" className="no-underline-force">
             Sign in
+          </Link>
+        </p>
+
+        <p className="switch-form-text" style={{ marginTop: "10px" }}>
+          Have a code?{" "}
+          <Link to="/verify-email" className="no-underline-force">
+            Verify Account
           </Link>
         </p>
       </div>

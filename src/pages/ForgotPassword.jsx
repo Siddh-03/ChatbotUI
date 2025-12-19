@@ -1,123 +1,90 @@
-import React, { useState, useEffect, useRef } from "react";
-import "../styles/Login.css";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { authService } from "../services/authService"; // Import Service
+import { authService } from "../services/authService";
+import "../styles/Login.css"; // Reusing login styles for consistency
 
 const ForgotPassword = () => {
+  useEffect(() => {
+    document.title = "Forgot Password | AgentVerse";
+  }, []);
+
   const navigate = useNavigate();
+
+  // Steps: 1 = Email, 2 = OTP, 3 = New Password
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
-  // Data
+  // Form Data
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [passwords, setPasswords] = useState({ new: "", confirm: "" });
-
-  // UI
-  const [errors, setErrors] = useState({});
-  const [timer, setTimer] = useState(60);
-  const [isExpired, setIsExpired] = useState(false);
-  const [showPass, setShowPass] = useState(false);
-  const [showConfirmPass, setShowConfirmPass] = useState(false);
-
-  const otpRefs = useRef([]);
-
-  // Timer Logic
-  useEffect(() => {
-    let interval;
-    if (step === 2 && timer > 0) {
-      interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
-    } else if (step === 2 && timer === 0) {
-      setIsExpired(true);
-    }
-    return () => clearInterval(interval);
-  }, [step, timer]);
+  const [otp, setOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   // --- STEP 1: SEND OTP ---
-  const handleEmailSubmit = async (e) => {
+  const handleSendOtp = async (e) => {
     e.preventDefault();
-    if (!email) return setErrors({ email: "Email required." });
-
     setLoading(true);
+    setError("");
+
     try {
-      // API CALL
       await authService.forgotPassword(email);
+      setSuccessMsg("OTP sent to your email.");
       setStep(2);
-      setTimer(60);
-      setIsExpired(false);
-      setErrors({});
-    } catch (error) {
-      setErrors({
-        email:
-          error.response?.data?.message ||
-          "User not found or error sending OTP.",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResend = async () => {
-    setLoading(true);
-    try {
-      await authService.forgotPassword(email); // Resend API
-      setTimer(60);
-      setIsExpired(false);
-      setOtp(["", "", "", "", "", ""]);
-      otpRefs.current[0]?.focus();
-    } catch (error) {
-      alert("Failed to resend OTP.");
+    } catch (err) {
+      setError(
+        err.response?.data?.error || "Failed to send OTP. User may not exist."
+      );
     } finally {
       setLoading(false);
     }
   };
 
   // --- STEP 2: VERIFY OTP ---
-  const handleOtpChange = (index, value) => {
-    if (isExpired || isNaN(value)) return;
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-    if (value && index < 5) otpRefs.current[index + 1].focus();
-  };
-
-  const handleOtpSubmit = async (e) => {
+  const handleVerifyOtp = async (e) => {
     e.preventDefault();
-    const code = otp.join("");
-    if (code.length < 6) return setErrors({ otp: "Enter full 6-digit code." });
-
     setLoading(true);
+    setError("");
+
     try {
-      // API CALL
-      await authService.verifyOtp(email, code);
-      setStep(3); // Success, move to password
-      setErrors({});
-    } catch (error) {
-      setErrors({ otp: "Invalid or expired OTP." });
+      await authService.verifyOtp(email, otp);
+      setSuccessMsg("OTP Verified! Please set your new password.");
+      setStep(3);
+    } catch (err) {
+      setError(err.response?.data?.error || "Invalid or expired OTP.");
     } finally {
       setLoading(false);
     }
   };
 
   // --- STEP 3: RESET PASSWORD ---
-  const handleFinalSubmit = async (e) => {
+  const handleResetPassword = async (e) => {
     e.preventDefault();
-    const { new: newPass, confirm: confirmPass } = passwords;
-
-    if (newPass.length < 8)
-      return setErrors({ newPass: "Password too short." });
-    if (newPass !== confirmPass)
-      return setErrors({ confirmPass: "Passwords do not match." });
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+    // Simple length check, backend handles regex
+    if (newPassword.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
 
     setLoading(true);
+    setError("");
+
     try {
-      const code = otp.join("");
-      // API CALL
-      await authService.resetPassword(email, code, newPass);
-      setStep(4); // Success screen
-      setTimeout(() => navigate("/login"), 3000);
-    } catch (error) {
-      setErrors({ newPass: "Failed to reset password. Try again." });
+      // Backend requires: email, otp, new_password
+      await authService.resetPassword(email, otp, newPassword);
+      setSuccessMsg("Password reset successful! Redirecting...");
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to reset password.");
     } finally {
       setLoading(false);
     }
@@ -134,147 +101,138 @@ const ForgotPassword = () => {
           />
         </div>
 
-        {step === 1 && <h1>Reset Password</h1>}
-        {step === 2 && <h1>Enter Verification Code</h1>}
-        {step === 3 && <h1>Set New Password</h1>}
-        {step === 4 && <h1>Success!</h1>}
+        <h1>Reset Password</h1>
 
-        {/* STEP 1: EMAIL */}
         {step === 1 && (
-          <form onSubmit={handleEmailSubmit}>
-            <p className="subtitle">Enter your email to receive a code.</p>
-            <div className="form-group">
-              <label>Email</label>
-              <div className="input-wrapper">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@example.com"
-                  className={errors.email ? "input-error" : ""}
-                />
-              </div>
-              {errors.email && (
-                <span className="error-text">{errors.email}</span>
-              )}
-            </div>
-            <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? "Sending..." : "Get OTP"}
-            </button>
-            <div className="switch-form-text">
-              <Link to="/login" className="go-back-link">
-                Back to Login
-              </Link>
-            </div>
-          </form>
+          <p className="subtitle">Enter your email to receive a code.</p>
         )}
-
-        {/* STEP 2: OTP */}
         {step === 2 && (
-          <form onSubmit={handleOtpSubmit}>
-            <p className="subtitle">
-              Sent to <b>{email}</b>
-            </p>
-            <div className="otp-container">
-              {otp.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={(el) => (otpRefs.current[index] = el)}
-                  type="text"
-                  maxLength="1"
-                  className="otp-box"
-                  value={digit}
-                  onChange={(e) => handleOtpChange(index, e.target.value)}
-                />
-              ))}
-            </div>
-            {errors.otp && (
-              <span
-                className="error-text"
-                style={{
-                  display: "block",
-                  textAlign: "center",
-                  marginBottom: 10,
-                }}
-              >
-                {errors.otp}
-              </span>
-            )}
-
-            <div className="timer-text">
-              00:{timer < 10 ? `0${timer}` : timer}
-            </div>
-            {isExpired && (
-              <span className="go-back-link" onClick={handleResend}>
-                Resend OTP
-              </span>
-            )}
-
-            <button
-              type="submit"
-              className="btn-primary"
-              disabled={loading || isExpired}
-            >
-              {loading ? "Verifying..." : "Verify Code"}
-            </button>
-          </form>
+          <p className="subtitle">
+            Enter the OTP sent to <b>{email}</b>
+          </p>
         )}
-
-        {/* STEP 3: PASSWORD */}
         {step === 3 && (
-          <form onSubmit={handleFinalSubmit}>
-            <p className="subtitle">Create a strong password.</p>
-            <div className="form-group">
-              <label>New Password</label>
-              <div className="input-wrapper">
-                <input
-                  type={showPass ? "text" : "password"}
-                  value={passwords.new}
-                  onChange={(e) =>
-                    setPasswords({ ...passwords, new: e.target.value })
-                  }
-                  placeholder="New password"
-                />
-                <i
-                  className={`fas ${
-                    showPass ? "fa-eye-slash" : "fa-eye"
-                  } password-toggle-icon`}
-                  onClick={() => setShowPass(!showPass)}
-                ></i>
-              </div>
-              {errors.newPass && (
-                <span className="error-text">{errors.newPass}</span>
-              )}
-            </div>
-            <div className="form-group">
-              <label>Confirm Password</label>
-              <div className="input-wrapper">
-                <input
-                  type={showConfirmPass ? "text" : "password"}
-                  value={passwords.confirm}
-                  onChange={(e) =>
-                    setPasswords({ ...passwords, confirm: e.target.value })
-                  }
-                  placeholder="Confirm password"
-                />
-              </div>
-              {errors.confirmPass && (
-                <span className="error-text">{errors.confirmPass}</span>
-              )}
-            </div>
-            <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? "Updating..." : "Reset Password"}
-            </button>
-          </form>
+          <p className="subtitle">Create a new secure password.</p>
         )}
 
-        {/* STEP 4: SUCCESS */}
-        {step === 4 && (
-          <div style={{ textAlign: "center", padding: "20px" }}>
-            <h2 style={{ color: "#27AE60" }}>Password Reset!</h2>
-            <p>Redirecting to login...</p>
+        {error && (
+          <div
+            className="error-text"
+            style={{ textAlign: "center", marginBottom: "15px" }}
+          >
+            {error}
           </div>
         )}
+        {successMsg && (
+          <div
+            style={{
+              color: "#27ae60",
+              textAlign: "center",
+              marginBottom: "15px",
+            }}
+          >
+            {successMsg}
+          </div>
+        )}
+
+        <form
+          onSubmit={
+            step === 1
+              ? handleSendOtp
+              : step === 2
+              ? handleVerifyOtp
+              : handleResetPassword
+          }
+        >
+          {/* STEP 1: EMAIL INPUT */}
+          {step === 1 && (
+            <div className="form-group">
+              <label>Email Address</label>
+              <div className="input-wrapper">
+                <i className="fas fa-envelope input-icon"></i>
+                <input
+                  type="email"
+                  required
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* STEP 2: OTP INPUT */}
+          {step === 2 && (
+            <div className="form-group">
+              <label>OTP Code</label>
+              <div className="input-wrapper">
+                <i className="fas fa-key input-icon"></i>
+                <input
+                  type="text"
+                  required
+                  placeholder="Enter 6-digit OTP"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* STEP 3: NEW PASSWORD */}
+          {step === 3 && (
+            <>
+              <div className="form-group">
+                <label>New Password</label>
+                <div className="input-wrapper">
+                  <i className="fas fa-lock input-icon"></i>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    required
+                    placeholder="New password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                  />
+                  <i
+                    className={`fas ${
+                      showPassword ? "fa-eye-slash" : "fa-eye"
+                    } password-toggle-icon`}
+                    onClick={() => setShowPassword(!showPassword)}
+                  ></i>
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Confirm Password</label>
+                <div className="input-wrapper">
+                  <i className="fas fa-lock input-icon"></i>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    required
+                    placeholder="Confirm new password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          <button type="submit" className="btn-primary" disabled={loading}>
+            {loading
+              ? "Processing..."
+              : step === 1
+              ? "Send OTP"
+              : step === 2
+              ? "Verify OTP"
+              : "Reset Password"}
+          </button>
+        </form>
+
+        <p className="switch-form-text">
+          Remember your password?{" "}
+          <Link to="/login" className="no-underline-force">
+            Sign In
+          </Link>
+        </p>
       </div>
     </div>
   );

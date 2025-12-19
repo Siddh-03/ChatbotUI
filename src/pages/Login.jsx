@@ -15,10 +15,20 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const success = login(email, password);
+  // CRITICAL FIX: 'async' keyword allows us to pause execution
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Stops the form from reloading the page
+    setLoading(true);
+    setError("");
+
+    // CRITICAL FIX: 'await' ensures we wait for the API response
+    // If you remove this, the code continues immediately and fails!
+    const success = await login(email, password);
+
+    setLoading(false);
+
     if (success) {
       navigate("/dashboard");
     } else {
@@ -87,8 +97,8 @@ const Login = () => {
             </Link>
           </div>
 
-          <button type="submit" className="btn-primary">
-            Sign In
+          <button type="submit" className="btn-primary" disabled={loading}>
+            {loading ? "Signing In..." : "Sign In"}
           </button>
         </form>
 
