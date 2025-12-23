@@ -37,6 +37,8 @@ export const useDashboard = () => {
 
   // --- FETCH USER PROFILE ---
   const fetchUserProfile = useCallback(async () => {
+    // TEMPORARY: Commented out to avoid 401 Unauthorized loops during testing
+    /*
     try {
       const response = await authService.getUserProfile();
 
@@ -64,13 +66,14 @@ export const useDashboard = () => {
     } catch (error) {
       console.error("Failed to fetch profile:", error);
     }
-  }, [user.phone]); // Dependency on phone in case we want to preserve local phone if missing from backend
+    */
+  }, [user.phone]);
 
   // --- AUTO-FETCH ON MOUNT ---
   useEffect(() => {
     const initDashboard = async () => {
       if (isAuthenticated) {
-        await fetchUserProfile();
+        // await fetchUserProfile(); // <--- Commented out
       }
       setShowLoader(false);
     };
@@ -87,7 +90,7 @@ export const useDashboard = () => {
       localStorage.setItem("isAuthenticated", "true");
 
       // Fetch full profile immediately after login to get the name
-      await fetchUserProfile();
+      // await fetchUserProfile(); // <--- Commented out to prevent 401 error from logout
 
       return true;
     } catch (error) {
@@ -144,7 +147,7 @@ export const useDashboard = () => {
     login,
     logout,
     fetchUserProfile,
-    updateProfile, // Exported so ProfileSection can use it
+    updateProfile,
     sidebarCollapsed,
     setSidebarCollapsed,
     sidebarMobileOpen,

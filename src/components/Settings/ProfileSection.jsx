@@ -18,11 +18,11 @@ const ProfileSection = () => {
 
   useEffect(() => {
     if (user) {
-      // If user.firstName exists (from our hook logic), use it.
-      // Otherwise fallback to splitting 'name' manually.
+      // Determine First/Last name securely
       let first = user.firstName;
       let last = user.lastName;
 
+      // Fallback: if firstName is missing but name exists (e.g. from backend direct fetch)
       if (!first && user.name) {
         const parts = user.name.split(" ");
         first = parts[0];
@@ -46,9 +46,6 @@ const ProfileSection = () => {
       tempErrors.firstName = "First name is required";
     if (!formData.lastName.trim())
       tempErrors.lastName = "Last name is required";
-
-    // Username is often read-only or derived, but if editable:
-    // if (!formData.username.trim()) tempErrors.username = "Username is required";
 
     if (formData.phone && formData.phone.length !== 10) {
       tempErrors.phone = "Phone number must be 10 digits";
@@ -77,9 +74,7 @@ const ProfileSection = () => {
 
   const handleSave = () => {
     if (validate()) {
-      // Updates local context. Note: Backend API to update name isn't available yet,
-      // so this will only reflect in the UI for the current session or until refresh
-      // if not persisted to DB.
+      // Updates local context and reconstructs the full name in useDashboard
       updateProfile(formData);
       alert("Profile updated successfully (Local session only)!");
     }

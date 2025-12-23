@@ -1,22 +1,23 @@
 import api from "./api";
+import axios from "axios";
 
 export const authService = {
   // --- AUTHENTICATION ---
 
   login: async (email, password) => {
     const payload = { email, password };
+    // Proxies to /api/user/login
     const response = await api.post("/login", payload);
 
     if (response.data.token) {
       localStorage.setItem("authToken", response.data.token);
-      // We don't have the user object here, just email.
-      // The hook will fetch the full profile via getUserProfile.
       localStorage.setItem("agentVerseUser", JSON.stringify({ email }));
     }
     return response.data;
   },
 
   signup: async (userData) => {
+    // Proxies to /api/user/register
     const params = new URLSearchParams();
     params.append("email", userData.email);
     params.append("name", userData.name);
@@ -28,11 +29,8 @@ export const authService = {
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
     });
 
-    // Check if registration was successful and if 'user' object is in response
     if (response.data.status === "pending" || response.status === 201) {
-      // The backend returns the full user object in response.data.user
       const backendUser = response.data.user;
-
       if (backendUser) {
         const userToSave = {
           ...backendUser,
@@ -42,24 +40,20 @@ export const authService = {
             : "",
         };
         localStorage.setItem("agentVerseUser", JSON.stringify(userToSave));
-      } else {
-        // Fallback if backend structure changes
-        const tempUser = {
-          name: userData.name,
-          email: userData.email,
-          phone: userData.phone_number,
-          profession_id: userData.profession_id,
-        };
-        localStorage.setItem("tempSignupData", JSON.stringify(tempUser));
       }
     }
-
     return response.data;
   },
 
   verifyEmailByEmail: async (email, code) => {
+    // Proxies to /api/user/verifyEmail
     const payload = { email: email, code: String(code) };
     return api.post("/verifyEmail", payload);
+  },
+
+  resendVerificationEmail: async (email) => {
+    // Proxies to /api/user/sendVerificationEmail
+    return api.post("/sendVerificationEmail", { email });
   },
 
   logout: async () => {
@@ -98,7 +92,7 @@ export const authService = {
   // --- PROFILE ---
 
   getUserProfile: async () => {
-    // Fetches the current user's data using the token
+    // Proxies to /api/user/me
     return api.get("/me");
   },
 
@@ -111,11 +105,16 @@ export const authService = {
   },
 
   deleteAccount: async () => {
-    throw {
-      response: {
-        status: 501,
-        data: { error: "Feature temporarily unavailable" },
-      },
-    };
+    // Proxies to /api/user/delete-account
+    return api.delete("/delete-account");
+  },
+
+  // --- API KEYS ---
+
+  fetchActiveApiKey: async () => {
+    // Uses the generic /api proxy to reach /api/auth/active-api-key
+    // We cannot use the 'api' instance here because it is base-mapped to /backend
+    const response = await axios.get("/api/auth/active-api-key");
+    return response.data;
   },
 };

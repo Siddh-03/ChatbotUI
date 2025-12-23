@@ -6,17 +6,15 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      // --- FIX: MOVED THIS TO THE TOP ---
-      // This must be BEFORE "/api" because "/api-admin" starts with "/api"
+      // Admin API: Maps /api-admin/admin/get-users -> /api/admin/get-users
       "/api-admin": {
         target: "http://multiai-chatbots.ybaisolution.com",
         changeOrigin: true,
         secure: false,
-        // Rewrite removes "/api-admin" so the target receives "/api/admin/login"
-        rewrite: (path) => path.replace(/^\/api-admin/, ""),
+        rewrite: (path) => path.replace(/^\/api-admin/, "/api"),
       },
 
-      // Existing Chatbots Proxy
+      // Chatbots API: Maps /bot-api/ybai_fitfusionai -> /ybai_fitfusionai
       "/bot-api": {
         target: "http://multiai-chatbots.ybaisolution.com",
         changeOrigin: true,
@@ -24,7 +22,7 @@ export default defineConfig({
         secure: false,
       },
 
-      // UNIVERSAL PROXY
+      // User API: Maps /backend/login -> /api/user/login
       "/backend": {
         target: "http://multiai-chatbots.ybaisolution.com",
         changeOrigin: true,
@@ -32,10 +30,9 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/backend/, "/api/user"),
       },
 
-      // General API fallback
-      // This must be BELOW "/api-admin"
+      // General API: Fallback for /api/auth endpoints
       "/api": {
-        target: "http://multiai-chatbots.ybaisolution.com/api",
+        target: "http://multiai-chatbots.ybaisolution.com",
         changeOrigin: true,
         secure: false,
       },

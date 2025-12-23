@@ -15,8 +15,17 @@ const Sidebar = ({ collapsed, onToggle, user, greeting }) => {
   // Helper to check if a link is active
   const isActive = (path) => (location.pathname === path ? "dash-active" : "");
 
-  // Use First Name if available, otherwise fallback to full name or "User"
-  const displayName = user?.firstName || user?.name || "User";
+  // Robust display name logic:
+  // 1. Try firstName
+  // 2. Try splitting name
+  // 3. Fallback to "User"
+  const displayName =
+    user?.firstName || (user?.name ? user.name.split(" ")[0] : "User");
+
+  // Optional: Full name for specific display if needed
+  const fullName =
+    user?.name ||
+    (user?.firstName ? `${user.firstName} ${user.lastName || ""}` : "User");
 
   return (
     <aside className={`dash-sidebar ${collapsed ? "dash-collapsed" : ""}`}>
@@ -37,9 +46,12 @@ const Sidebar = ({ collapsed, onToggle, user, greeting }) => {
           {/* If user has a photo URL, you could use it here, otherwise default icon */}
           <FaUserAstronaut />
         </div>
-        {/* Updated Greeting Logic */}
+
+        {/* Updated Greeting Logic to ensure name is clearly associated */}
         <span className="dash-user-greeting">{greeting},</span>
-        <div className="dash-user-name">{displayName}</div>
+        <div className="dash-user-name" title={fullName}>
+          {displayName}
+        </div>
       </div>
 
       <nav className="dash-main-nav">
