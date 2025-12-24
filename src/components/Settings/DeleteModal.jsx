@@ -1,32 +1,33 @@
 import React, { useState } from "react";
-// import { authService } from "../../services/authService"; // Keep if you use it later
+import { authService } from "../../services/authService";
 
 const DeleteModal = ({ isOpen, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [confirmInput, setConfirmInput] = useState(""); // 1. New State for Input
+  const [confirmInput, setConfirmInput] = useState("");
 
   if (!isOpen) return null;
 
   const handleDelete = async () => {
-    if (confirmInput !== "delete") return; // Safety check
+    if (confirmInput !== "delete") return;
 
-    // Backend Limitation Check
-    setError(
-      "This feature is currently disabled by the administrator (Backend endpoint missing)."
-    );
-    return;
+    setLoading(true);
+    setError("");
 
-    /* setLoading(true);
     try {
+      // 1. Call API
       await authService.deleteAccount();
-      // ...
+
+      // 2. Logout and Redirect (handled by logout service)
+      await authService.logout();
     } catch (err) {
-      setError("Failed to delete account.");
-    } finally {
+      console.error(err);
+      setError(
+        err.response?.data?.message ||
+          "Failed to delete account. Please try again."
+      );
       setLoading(false);
-    } 
-    */
+    }
   };
 
   return (
@@ -44,7 +45,6 @@ const DeleteModal = ({ isOpen, onClose }) => {
           <strong>delete</strong> below.
         </p>
 
-        {/* 2. New Input Field */}
         <div className="settings-modal-input">
           <input
             type="text"
@@ -82,9 +82,8 @@ const DeleteModal = ({ isOpen, onClose }) => {
           <button
             className="dash-button-danger dash-button-sm"
             onClick={handleDelete}
-            // 3. Disable button if input doesn't match "delete"
             disabled={loading || confirmInput !== "delete"}
-            style={{ opacity: confirmInput !== "delete" ? 0.5 : 1 }}
+            style={{ opacity: confirmInput !== "delete" || loading ? 0.5 : 1 }}
           >
             {loading ? "Deleting..." : "Delete Account"}
           </button>

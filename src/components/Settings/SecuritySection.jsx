@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import SettingsCard from "./SettingsCard";
+import { authService } from "../../services/authService";
+import { useDashboard } from "../../hooks/useDashboard";
 
 const SecuritySection = () => {
+  const { user } = useDashboard(); // Get user email from context
   const [passwords, setPasswords] = useState({
     current: "",
     new: "",
@@ -12,6 +15,7 @@ const SecuritySection = () => {
     new: false,
     confirm: false,
   });
+  const [status, setStatus] = useState({ loading: false, type: "", msg: "" });
 
   const toggle = (field) => {
     setShow((prev) => ({ ...prev, [field]: !prev[field] }));
@@ -19,15 +23,54 @@ const SecuritySection = () => {
 
   const handleChange = (e) => {
     setPasswords({ ...passwords, [e.target.name]: e.target.value });
+    // Clear errors when typing
+    if (status.msg) setStatus({ loading: false, type: "", msg: "" });
   };
 
-  const handleUpdate = () => {
-    if (passwords.new !== passwords.confirm) {
-      alert("New passwords do not match!");
+  const handleUpdate = async () => {
+    if (!passwords.current || !passwords.new || !passwords.confirm) {
+      setStatus({
+        loading: false,
+        type: "error",
+        msg: "All fields are required.",
+      });
       return;
     }
-    alert("Password updated successfully!");
-    setPasswords({ current: "", new: "", confirm: "" });
+    if (passwords.new !== passwords.confirm) {
+      setStatus({
+        loading: false,
+        type: "error",
+        msg: "New passwords do not match!",
+      });
+      return;
+    }
+
+    try {
+      setStatus({ loading: true, type: "", msg: "" });
+      await authService.changePassword(
+        user.email,
+        passwords.current,
+        passwords.new
+      );
+      setStatus({
+        loading: false,
+        type: "success",
+        msg: "Password updated successfully!",
+      });
+      setPasswords({ current: "", new: "", confirm: "" });
+    } catch (error) {
+      // FIX: Check 'error' property first (used by user 1.py), then 'message'
+      const errorText =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Incorrect current password.";
+
+      setStatus({
+        loading: false,
+        type: "error",
+        msg: errorText,
+      });
+    }
   };
 
   return (
@@ -121,8 +164,31 @@ const SecuritySection = () => {
         </div>
       </div>
 
-      <button className="dash-button" onClick={handleUpdate}>
-        <i className="fas fa-key"></i> Change Password
+      {/* Status Message Area */}
+      {status.msg && (
+        <div
+          style={{
+            marginBottom: "15px",
+            color: status.type === "error" ? "#ff4b4b" : "#00c853",
+            fontSize: "0.9rem",
+          }}
+        >
+          {status.msg}
+        </div>
+      )}
+
+      <button
+        className="dash-button"
+        onClick={handleUpdate}
+        disabled={status.loading}
+        style={{ opacity: status.loading ? 0.7 : 1 }}
+      >
+        {status.loading ? (
+          <i className="fas fa-spinner fa-spin"></i>
+        ) : (
+          <i className="fas fa-key"></i>
+        )}
+        {status.loading ? " Updating..." : " Change Password"}
       </button>
     </SettingsCard>
   );
